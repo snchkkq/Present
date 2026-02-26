@@ -1,0 +1,1409 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>I Love You</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 40%, rgba(45, 8, 27, 0.35), rgba(0, 0, 0, 0.98) 62%);
+      transition: opacity 480ms ease;
+    }
+
+    #intro.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #intro.exiting {
+      pointer-events: none;
+    }
+
+    #startBtn {
+      border: 0;
+      background: transparent;
+      color: #ffd2e8;
+      font-family: 'Georgia', serif;
+      font-size: clamp(22px, 3.8vw, 34px);
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+      cursor: pointer;
+      text-align: center;
+      text-shadow:
+        0 0 14px rgba(255, 120, 178, 0.45),
+        0 0 26px rgba(255, 88, 155, 0.25);
+      animation: introPulse 1900ms ease-in-out infinite;
+    }
+
+    #intro.exiting #startBtn {
+      animation: introExit 540ms cubic-bezier(.2, .9, .2, 1) forwards;
+    }
+
+    #intro.exiting {
+      animation: introFade 420ms ease forwards 180ms;
+    }
+
+    #startBtn .heart {
+      display: block;
+      font-size: clamp(42px, 8vw, 68px);
+      margin-bottom: 10px;
+    }
+
+    #startBtn .label {
+      display: block;
+      font-size: clamp(18px, 2.8vw, 28px);
+    }
+
+    @keyframes introPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.9;
+      }
+
+      50% {
+        transform: scale(1.04);
+        opacity: 1;
+      }
+    }
+
+    @keyframes introExit {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      34% {
+        transform: scale(1.11);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(0.78);
+        opacity: 0;
+      }
+    }
+
+    @keyframes introFade {
+      from {
+        opacity: 1;
+      }
+
+      to {
+        opacity: 0;
+      }
+    }
+
+    #txt {
+      position: fixed;
+      bottom: 60px;
+      width: 100%;
+      text-align: center;
+      font-family: 'Georgia', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(22px, 3.5vw, 42px);
+      letter-spacing: 0.22em;
+      color: rgba(255, 165, 190, 0);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    #txt .word {
+      display: inline-block;
+      color: rgba(255, 170, 200, 0.97);
+      opacity: 0;
+      transform: translateY(2px);
+      filter: blur(1px);
+      text-shadow:
+        0 0 12px rgba(255, 130, 185, 0.32),
+        0 0 4px rgba(255, 220, 235, 0.26);
+      transition: opacity 460ms ease, transform 460ms ease, filter 460ms ease;
+    }
+
+    #txt .word.visible {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+
+    #txt::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0.25);
+      transform-origin: center;
+      bottom: -8px;
+      width: min(380px, 72vw);
+      height: 2px;
+      background: linear-gradient(90deg, rgba(255, 135, 190, 0), rgba(255, 175, 215, 0.95), rgba(255, 135, 190, 0));
+      filter: drop-shadow(0 0 6px rgba(255, 145, 200, 0.55));
+      opacity: 0;
+    }
+
+    #txt.line-on::after {
+      animation: lineIn 850ms cubic-bezier(.2, .9, .2, 1) forwards, linePulse 2600ms ease-in-out infinite 850ms;
+    }
+
+    @keyframes lineIn {
+      from {
+        opacity: 0;
+        transform: translateX(-50%) scaleX(0.25);
+        filter: drop-shadow(0 0 2px rgba(255, 145, 200, 0.2));
+      }
+
+      to {
+        opacity: 0.9;
+        transform: translateX(-50%) scaleX(1);
+        filter: drop-shadow(0 0 10px rgba(255, 160, 210, 0.78));
+      }
+    }
+
+    @keyframes linePulse {
+
+      0%,
+      100% {
+        opacity: 0.88;
+        filter: drop-shadow(0 0 10px rgba(255, 160, 210, 0.76));
+      }
+
+      50% {
+        opacity: 1;
+        filter: drop-shadow(0 0 14px rgba(255, 176, 220, 0.9));
+      }
+    }
+
+    @media (max-width: 520px) {
+      #txt {
+        letter-spacing: 0.15em;
+      }
+    }
+
+    #prelude {
+      position: fixed;
+      inset: 0;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 280ms ease;
+    }
+
+    #prelude.show {
+      opacity: 1;
+    }
+
+    #prelude.done {
+      opacity: 0;
+    }
+
+    #prelude .word {
+      display: inline-block;
+      margin: 0 0.18em;
+      font-family: 'Georgia', serif;
+      font-size: clamp(26px, 5.2vw, 56px);
+      font-style: italic;
+      color: rgba(255, 180, 208, 0.98);
+      text-shadow:
+        0 0 12px rgba(255, 120, 180, 0.35),
+        0 0 22px rgba(255, 98, 165, 0.2);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 600ms ease, transform 600ms ease;
+      white-space: nowrap;
+    }
+
+    #prelude .word.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #prelude .word.accent,
+    #prelude2 .word.accent {
+      color: rgba(255, 228, 240, 1);
+      text-shadow:
+        0 0 14px rgba(255, 178, 216, 0.66),
+        0 0 30px rgba(255, 126, 190, 0.44);
+      position: relative;
+    }
+
+    #prelude .word.accent::after,
+    #prelude2 .word.accent::after {
+      content: "";
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      bottom: -0.14em;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255, 145, 198, 0), rgba(255, 206, 230, 0.95), rgba(255, 145, 198, 0));
+      box-shadow: 0 0 8px rgba(255, 176, 218, 0.72);
+      opacity: 0.95;
+    }
+
+    #prelude2 {
+      position: fixed;
+      inset: 0;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 280ms ease;
+    }
+
+    #prelude2.show {
+      opacity: 1;
+    }
+
+    #prelude2.done {
+      opacity: 0;
+    }
+
+    #prelude2 .word {
+      display: inline-block;
+      margin: 0 0.18em;
+      font-family: 'Georgia', serif;
+      font-size: clamp(26px, 5.2vw, 56px);
+      font-style: italic;
+      color: rgba(255, 180, 208, 0.98);
+      text-shadow:
+        0 0 12px rgba(255, 120, 180, 0.35),
+        0 0 22px rgba(255, 98, 165, 0.2);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 600ms ease, transform 600ms ease;
+      white-space: nowrap;
+    }
+
+    #prelude2 .word.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="intro">
+    <button id="startBtn" type="button" aria-label="Start animation">
+      <span class="heart">❤️</span>
+      <span class="label">Click me</span>
+    </button>
+  </div>
+  <div id="prelude" aria-hidden="true">
+    <span class="word">This</span>
+    <span class="word">is</span>
+    <span class="word">all</span>
+    <span class="word">for</span>
+    <span class="word accent">You</span>
+  </div>
+  <div id="prelude2" aria-hidden="true">
+    <span class="word">You</span>
+    <span class="word">are</span>
+    <span class="word">my</span>
+    <span class="word accent">Shayla</span>
+  </div>
+  <canvas id="c"></canvas>
+  <div id="txt">
+    <span class="word" style="--delay: 0ms;">I</span>
+    <span class="word" style="--delay: 190ms;">Love</span>
+    <span class="word" style="--delay: 380ms;">You</span>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+
+    let W = 0;
+    let H = 0;
+    let cx = 0;
+    let cy = 0;
+    let sc = 0;
+
+    // Minimal controls: only delay + speed for each animation block.
+    const ANIM = {
+      contour: {
+        delay: 0.45, // seconds before contour starts drawing
+        speed: 0.5,  // drawing speed (higher = faster)
+        glow: 5   // brightness of the neon glow after contour is complete (0..1)
+      },
+      network: {
+        delay: -2.2,
+        speed: 2
+      },
+      words: {
+        delay: 1.5,
+        speed: 1
+      },
+      line: {
+        delay: 0.5,
+        speed: 1
+      },
+      sweep: {
+        delay: 0.2,      // seconds after line before sweep starts
+        speed: 40,       // speed of the existing orb sweep
+        sweepSpeed: 7, // speed of the white contour sweep (cycles per second)
+      },
+      preludeFirst: {
+        delay: 8.4,
+        speed: 1
+      },
+      preludeSecond: {
+        delay: 17.21,
+        speed: 1
+      },
+      main: {
+        delay: 22.15,
+        speed: 0.74
+      }
+    };
+    window.ANIM = ANIM;
+
+    const INTERIOR_COUNT = 480;
+    const CONTOUR_COUNT = 260;
+    const BIRTH_DUR = 1.05 / Math.max(0.1, ANIM.contour.speed);
+    const SPRING = 10.5;
+    const DAMPING = 0.86;
+    const CONTOUR_START = ANIM.contour.delay;
+    const CONTOUR_STEP = 0.012 / Math.max(0.1, ANIM.contour.speed);
+    const INTERIOR_START = 1.35;
+    const CONTOUR_LINE_ALPHA = 0.62;
+
+    const particles = [];
+    const boundary = [];
+    let heartClipPath = null;
+    const links = [];
+    const LINK_DIST = 42;
+    const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
+    const MIN_LINKS_PER_NODE = 2;
+    const MAX_LINKS_PER_NODE = 5;
+    const LINK_ALPHA_SMOOTH = 9;
+    const LINK_WOBBLE = 3.1;
+    const LINK_FLOW_SPEED = 5.6;
+    const LINK_DRIFT = 2.4;
+    const DEPTH_POINT_SCALE = [0.72, 1.0, 1.42];
+    const DEPTH_POINT_ALPHA = [0.45, 0.95, 1.32];
+    const DEPTH_GLOW_ALPHA = [0.05, 0.15, 0.34];
+    const DEPTH_LINK_ALPHA = [0.46, 1.02, 1.48];
+    const DEPTH_LINK_WIDTH = [0.72, 1.08, 1.5];
+    let contourStartIndex = 0;
+    const BND_FIXED = [];
+    let BND_TOP_IDX = 0;
+
+    function pickDepthLayer() {
+      const r = Math.random();
+      if (r < 0.34) return 0; // far
+      if (r < 0.77) return 1; // mid
+      return 2; // front
+    }
+
+    function hx(t) {
+      return 16 * Math.pow(Math.sin(t), 3);
+    }
+
+    function hy(t) {
+      return -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+    }
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      cx = W / 2;
+      cy = H / 2 - 70;
+      sc = Math.min(W, H) * 0.029;
+      buildHeart();
+      resetAnimation();
+    }
+
+    function buildHeart() {
+      boundary.length = 0;
+      const HEART_SEGMENTS = 900;
+      for (let i = 0; i < HEART_SEGMENTS; i++) {
+        const t = (i / HEART_SEGMENTS) * Math.PI * 2;
+        boundary.push({ x: cx + hx(t) * sc, y: cy + hy(t) * sc });
+      }
+
+      // Fixed boundary for stable contour drawing (not affected by particle movement)
+      BND_FIXED.length = 0;
+      for (let i = 0; i < boundary.length; i++) BND_FIXED.push({ x: boundary[i].x, y: boundary[i].y });
+      // BND_TOP_IDX is set after contourStartIndex is computed below
+      heartClipPath = new Path2D();
+      heartClipPath.moveTo(boundary[0].x, boundary[0].y);
+      for (let i = 1; i < boundary.length; i++) {
+        heartClipPath.lineTo(boundary[i].x, boundary[i].y);
+      }
+      heartClipPath.closePath();
+
+      particles.length = 0;
+
+      const pairCount = Math.floor(INTERIOR_COUNT / 2);
+      for (let i = 0; i < pairCount; i++) {
+        const t = Math.random() * Math.PI * 2;
+        const r = Math.sqrt(Math.random()) * 0.965;
+        const sx = hx(t) * sc * r;
+        const txR = cx + Math.abs(sx);
+        const txL = cx - Math.abs(sx);
+        const ty = cy + hy(t) * sc * r;
+        const dy = ty - cy;
+        const radial = Math.sqrt(Math.abs(sx) * Math.abs(sx) + dy * dy) / (sc * 16);
+        const spawnAt = INTERIOR_START + (radial + (Math.random() - 0.5) * 0.06) * WAVE_DUR;
+        const size = 1.05 + Math.random() * 1.35;
+        const phase = Math.random() * Math.PI * 2;
+        const pulse = 0.5 + Math.random() * 0.9;
+        const depth = pickDepthLayer();
+
+        particles.push({
+          x: cx + (txR - cx) * 0.08,
+          y: cy + (ty - cy) * 0.08,
+          tx: txR,
+          ty,
+          vx: 0,
+          vy: 0,
+          alpha: 0,
+          born: false,
+          bornTime: 0,
+          spawnAt,
+          isContour: false,
+          size,
+          phase,
+          pulse,
+          mirrorSign: 1,
+          depth
+        });
+
+        particles.push({
+          x: cx + (txL - cx) * 0.08,
+          y: cy + (ty - cy) * 0.08,
+          tx: txL,
+          ty,
+          vx: 0,
+          vy: 0,
+          alpha: 0,
+          born: false,
+          bornTime: 0,
+          spawnAt,
+          isContour: false,
+          size,
+          phase,
+          pulse,
+          mirrorSign: -1,
+          depth
+        });
+      }
+
+      if (INTERIOR_COUNT % 2 === 1) {
+        const t = Math.random() * Math.PI * 2;
+        const r = Math.sqrt(Math.random()) * 0.965;
+        const tx = cx;
+        const ty = cy + hy(t) * sc * r;
+        const dy = ty - cy;
+        const spawnAt = INTERIOR_START + (Math.abs(dy) / (sc * 16) + (Math.random() - 0.5) * 0.06) * WAVE_DUR;
+        particles.push({
+          x: cx,
+          y: cy + (ty - cy) * 0.08,
+          tx,
+          ty,
+          vx: 0,
+          vy: 0,
+          alpha: 0,
+          born: false,
+          bornTime: 0,
+          spawnAt,
+          isContour: false,
+          size: 1.1 + Math.random() * 1.15,
+          phase: Math.random() * Math.PI * 2,
+          pulse: 0.55 + Math.random() * 0.8,
+          mirrorSign: 0,
+          depth: 1
+        });
+      }
+
+      // Build contour points with uniform arc-length spacing.
+      const closed = boundary.slice();
+      closed.push(boundary[0]);
+      const cumulative = new Array(closed.length).fill(0);
+      for (let i = 1; i < closed.length; i++) {
+        const dx = closed[i].x - closed[i - 1].x;
+        const dy = closed[i].y - closed[i - 1].y;
+        cumulative[i] = cumulative[i - 1] + Math.hypot(dx, dy);
+      }
+      const totalLen = cumulative[cumulative.length - 1] || 1;
+
+      let seg = 1;
+      for (let i = 0; i < CONTOUR_COUNT; i++) {
+        const targetLen = (i / CONTOUR_COUNT) * totalLen;
+        while (seg < cumulative.length - 1 && cumulative[seg] < targetLen) seg++;
+
+        const l0 = cumulative[seg - 1];
+        const l1 = cumulative[seg];
+        const t = l1 > l0 ? (targetLen - l0) / (l1 - l0) : 0;
+        const a = closed[seg - 1];
+        const b = closed[seg];
+        const tx = a.x + (b.x - a.x) * t;
+        const ty = a.y + (b.y - a.y) * t;
+
+        particles.push({
+          x: tx,
+          y: ty,
+          tx,
+          ty,
+          vx: 0,
+          vy: 0,
+          alpha: 0,
+          born: false,
+          bornTime: 0,
+          spawnAt: CONTOUR_START + i * CONTOUR_STEP,
+          isContour: true,
+          size: 1.25 + Math.random() * 0.95,
+          phase: 0,
+          pulse: 0,
+          mirrorSign: 0,
+          depth: 2
+        });
+      }
+
+      // Find TOP notch of heart = minimum y near cx (the dip between the two lobes)
+      // t = PI gives the bottom tip, t = PI/2 and t = 3PI/2 give the lobes
+      // The notch between lobes is near t=0 where hx=0 and hy is local min
+      // Find by scanning: smallest y value among contour particles near cx
+      let bestNotchScore = Infinity;
+      for (let i = 0; i < CONTOUR_COUNT; i++) {
+        const p = particles[INTERIOR_COUNT + i];
+        // score = y value + penalty for being far from cx (finds top-center notch)
+        const score = p.ty + Math.abs(p.tx - cx) * 1.5;
+        if (score < bestNotchScore) {
+          bestNotchScore = score;
+          contourStartIndex = i;
+        }
+      }
+
+      // Reveal contour symmetrically from the top notch to both sides.
+      for (let i = 0; i < CONTOUR_COUNT; i++) {
+        const p = particles[INTERIOR_COUNT + i];
+        const cw = (i - contourStartIndex + CONTOUR_COUNT) % CONTOUR_COUNT;
+        const ccw = (contourStartIndex - i + CONTOUR_COUNT) % CONTOUR_COUNT;
+        const ring = Math.min(cw, ccw);
+        p.spawnAt = CONTOUR_START + ring * CONTOUR_STEP;
+      }
+
+      // Sync BND_TOP_IDX with contourStartIndex
+      // The contour particle at contourStartIndex has target tx,ty — find closest BND_FIXED point
+      {
+        const refP = particles[INTERIOR_COUNT + contourStartIndex];
+        let bstD = Infinity;
+        for (let i = 0; i < BND_FIXED.length; i++) {
+          const dx = BND_FIXED[i].x - refP.tx;
+          const dy = BND_FIXED[i].y - refP.ty;
+          const d = dx * dx + dy * dy;
+          if (d < bstD) { bstD = d; BND_TOP_IDX = i; }
+        }
+      }
+
+      initInteriorNetwork();
+    }
+
+    const WAVE_START = 0.3;
+    const WAVE_DUR = 7.4 / Math.max(0.1, ANIM.network.speed);
+    const CONTOUR_END = WAVE_START + CONTOUR_START + CONTOUR_COUNT * CONTOUR_STEP;
+    const CONTOUR_FULLY_FORMED_AT = CONTOUR_END + BIRTH_DUR + 1.1;
+    const NETWORK_START = CONTOUR_FULLY_FORMED_AT + ANIM.network.delay;
+    const NETWORK_REVEAL_START = NETWORK_START + 0.55;
+    const NETWORK_REVEAL_DUR = 0.85 / Math.max(0.1, ANIM.network.speed);
+    const NETWORK_PARTICLES_DONE_AT = NETWORK_START + WAVE_DUR + BIRTH_DUR;
+    const NETWORK_LINKS_DONE_AT = NETWORK_REVEAL_START + NETWORK_REVEAL_DUR;
+    const NETWORK_FULLY_FORMED_AT = Math.max(NETWORK_PARTICLES_DONE_AT, NETWORK_LINKS_DONE_AT);
+    const TEXT_AFTER_NETWORK_SEC = ANIM.words.delay;
+    const TEXT_START = NETWORK_FULLY_FORMED_AT + TEXT_AFTER_NETWORK_SEC;
+    const NEON_SPEED = ANIM.sweep.speed; // contour points per second
+    const NEON_TAIL_STEPS = 74;
+    const NEON_TAIL_SPACING = 0.9;
+    const CONTOUR_THREAD_ALPHA = 0.78;
+
+    function ease(t) {
+      return 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+    }
+
+    const txtEl = document.getElementById('txt');
+    const wordEls = txtEl.querySelectorAll('.word');
+    const preludeEl = document.getElementById('prelude');
+    const preludeWords = preludeEl.querySelectorAll('.word');
+    const prelude2El = document.getElementById('prelude2');
+    const prelude2Words = prelude2El.querySelectorAll('.word');
+    const introEl = document.getElementById('intro');
+    const startBtn = document.getElementById('startBtn');
+    const bgMusic = new Audio('music/post malone & swae lee - Sunflower (sped up + reverb).mp3');
+    const wordBursts = [];
+    const dustParticles = [];
+    const DUST_PER_WORD = 95;
+    const WORD_STAGGER = 0.42 / Math.max(0.1, ANIM.words.speed);
+    const DUST_DUR = 1.05 / Math.max(0.1, ANIM.words.speed);
+    const DUST_START_JITTER_MAX = 0.22 / Math.max(0.1, ANIM.words.speed);
+    const DUST_LIFE_MAX_FACTOR = 1.12;
+    const PRELUDE_WORDS_START_AT_SEC = ANIM.preludeFirst.delay;
+    const PRELUDE2_WORDS_START_AT_SEC = ANIM.preludeSecond.delay;
+    const MAIN_ANIMATION_START_AT_SEC = ANIM.main.delay;
+    const MAIN_ANIMATION_END_AT_SEC = 50.0;
+    const LINE_AFTER_LAST_WORD_SEC = ANIM.line.delay;
+    const LINE_IN_DUR_SEC = 0.85 / Math.max(0.1, ANIM.line.speed);
+    const NEON_AFTER_LINE_SEC = ANIM.sweep.delay;
+    const MAIN_ANIMATION_TARGET_DUR_SEC = MAIN_ANIMATION_END_AT_SEC - MAIN_ANIMATION_START_AT_SEC;
+    const MAIN_TEXT_CHAIN_NOMINAL_DUR_SEC =
+      (wordEls.length - 1) * WORD_STAGGER +
+      DUST_START_JITTER_MAX +
+      DUST_DUR * DUST_LIFE_MAX_FACTOR +
+      LINE_AFTER_LAST_WORD_SEC +
+      LINE_IN_DUR_SEC +
+      NEON_AFTER_LINE_SEC;
+    const MAIN_NOMINAL_END_SEC = TEXT_START + MAIN_TEXT_CHAIN_NOMINAL_DUR_SEC + (CONTOUR_COUNT / NEON_SPEED);
+    // < 1 slows the whole main scene down to avoid early finish.
+    const MAIN_TIME_STRETCH = ANIM.main.speed;
+    const MAIN_TIME_SCALE = Math.max(
+      0.2,
+      (MAIN_NOMINAL_END_SEC / Math.max(0.1, MAIN_ANIMATION_TARGET_DUR_SEC)) * MAIN_TIME_STRETCH
+    );
+
+    let start = 0;
+    let last = 0;
+    let textStarted = false;
+    let started = false;
+    let startPending = false;
+    let lineStartAt = Infinity;
+    let contourNeonStartAt = Infinity;
+    bgMusic.loop = false;
+    bgMusic.volume = 0.62;
+
+    function resetAnimation() {
+      start = Date.now();
+      last = start;
+      textStarted = false;
+      lineStartAt = Infinity;
+      contourNeonStartAt = Infinity;
+      wordBursts.length = 0;
+      dustParticles.length = 0;
+      txtEl.classList.remove('line-on');
+      wordEls.forEach((w) => {
+        w.classList.remove('visible');
+      });
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x = cx + (p.tx - cx) * 0.08;
+        p.y = cy + (p.ty - cy) * 0.08;
+        p.vx = 0;
+        p.vy = 0;
+        p.alpha = 0;
+        p.born = false;
+        p.bornTime = 0;
+      }
+    }
+
+    function startText(elapsed) {
+      textStarted = true;
+      prepareWordBursts(elapsed);
+    }
+
+    function prepareWordBursts(startElapsed) {
+      wordBursts.length = 0;
+      dustParticles.length = 0;
+
+      wordEls.forEach((el, idx) => {
+        const rect = el.getBoundingClientRect();
+        const padX = Math.max(6, rect.width * 0.08);
+        const padY = Math.max(4, rect.height * 0.12);
+        const startTime = startElapsed + idx * WORD_STAGGER;
+
+        wordBursts.push({
+          idx,
+          start: startTime,
+          end: startTime + DUST_DUR,
+          revealed: false
+        });
+
+        for (let i = 0; i < DUST_PER_WORD; i++) {
+          const tx = rect.left + padX + Math.random() * Math.max(2, rect.width - padX * 2);
+          const ty = rect.top + padY + Math.random() * Math.max(2, rect.height - padY * 2);
+          const sx = tx + (Math.random() - 0.5) * (80 + rect.width * 0.6);
+          const sy = ty + 28 + Math.random() * 42;
+          dustParticles.push({
+            sx,
+            sy,
+            tx,
+            ty,
+            start: startTime + Math.random() * 0.22,
+            life: DUST_DUR * (0.78 + Math.random() * 0.34),
+            seed: Math.random() * Math.PI * 2,
+            size: 0.8 + Math.random() * 1.8
+          });
+        }
+      });
+
+      const deterministicWordsEnd =
+        startElapsed +
+        (wordEls.length - 1) * WORD_STAGGER +
+        DUST_START_JITTER_MAX +
+        DUST_DUR * DUST_LIFE_MAX_FACTOR;
+      lineStartAt = deterministicWordsEnd + LINE_AFTER_LAST_WORD_SEC;
+      contourNeonStartAt = lineStartAt + LINE_IN_DUR_SEC + NEON_AFTER_LINE_SEC;
+    }
+
+    function updateAndDrawWordDust(elapsed) {
+      for (let i = 0; i < wordBursts.length; i++) {
+        const b = wordBursts[i];
+        if (!b.revealed && elapsed >= b.start + DUST_DUR * 0.72) {
+          b.revealed = true;
+          wordEls[b.idx].classList.add('visible');
+        }
+      }
+
+      if (!txtEl.classList.contains('line-on') && elapsed >= lineStartAt) {
+        txtEl.classList.add('line-on');
+      }
+
+      for (let i = 0; i < dustParticles.length; i++) {
+        const d = dustParticles[i];
+        const t = (elapsed - d.start) / d.life;
+        if (t <= 0 || t >= 1) continue;
+
+        const e = ease(t);
+        const swirl = (1 - e) * (3.4 + d.size * 0.5);
+        const x = d.sx + (d.tx - d.sx) * e + Math.cos(e * 11 + d.seed) * swirl;
+        const y = d.sy + (d.ty - d.sy) * e + Math.sin(e * 9 + d.seed) * swirl * 0.75;
+        const alpha = Math.pow(1 - t, 0.52) * 0.92;
+
+        ctx.beginPath();
+        ctx.arc(x, y, d.size * (0.66 + (1 - e) * 0.72), 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,178,214,${alpha})`;
+        ctx.fill();
+      }
+    }
+
+    function drawParticles() {
+      for (let layer = 0; layer <= 2; layer++) {
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          if (p.alpha < 0.01 || p.depth !== layer) continue;
+
+          if (p.isContour) continue; // drawn by neon line, not as dots
+          const s = DEPTH_POINT_SCALE[layer];
+          const a = p.alpha * DEPTH_POINT_ALPHA[layer];
+          const g = p.alpha * DEPTH_GLOW_ALPHA[layer];
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * s, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,200,215,${a})`;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * (2.05 * s), 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255,100,140,${g})`;
+          ctx.lineWidth = 0.35 + layer * 0.06;
+          ctx.stroke();
+
+          if (layer === 2) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * (3.25 * s), 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(255,145,195,${p.alpha * 0.13})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function drawVolumeFog(elapsed) {
+      for (let layer = 0; layer <= 2; layer++) {
+        for (let i = 0; i < INTERIOR_COUNT; i++) {
+          const p = particles[i];
+          if (p.depth !== layer || p.alpha < 0.04) continue;
+          if ((i + layer) % 2 !== 0) continue;
+
+          const fogPulse = 0.86 + Math.sin(elapsed * 1.4 + p.phase) * 0.14;
+          const alpha = p.alpha * (0.016 + layer * 0.008) * fogPulse;
+          const radius = p.size * (4.8 + layer * 1.25);
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,110,165,${alpha})`;
+          ctx.fill();
+        }
+      }
+    }
+
+    function clipToHeartShape() {
+      if (!heartClipPath) return;
+      ctx.clip(heartClipPath);
+    }
+
+    function initInteriorNetwork() {
+      links.length = 0;
+      const linkCounts = new Uint8Array(INTERIOR_COUNT);
+      const grid = new Map();
+      const cellSize = LINK_DIST;
+      const edgeSet = new Set();
+
+      for (let i = 0; i < INTERIOR_COUNT; i++) {
+        const p = particles[i];
+        const gx = Math.floor(p.tx / cellSize);
+        const gy = Math.floor(p.ty / cellSize);
+        const key = `${gx}|${gy}`;
+        if (!grid.has(key)) grid.set(key, []);
+        grid.get(key).push(i);
+      }
+
+      for (let i = 0; i < INTERIOR_COUNT; i++) {
+        const a = particles[i];
+        const gx = Math.floor(a.tx / cellSize);
+        const gy = Math.floor(a.ty / cellSize);
+        const candidates = [];
+
+        for (let oy = -2; oy <= 2; oy++) {
+          for (let ox = -2; ox <= 2; ox++) {
+            const bucket = grid.get(`${gx + ox}|${gy + oy}`);
+            if (!bucket) continue;
+            for (let bi = 0; bi < bucket.length; bi++) {
+              const j = bucket[bi];
+              if (j === i) continue;
+
+              const b = particles[j];
+
+              const dx = a.tx - b.tx;
+              const dy = a.ty - b.ty;
+              const d2 = dx * dx + dy * dy;
+              if (d2 > LINK_DIST_SQ) continue;
+              candidates.push({ j, d2 });
+            }
+          }
+        }
+
+        candidates.sort((m, n) => m.d2 - n.d2);
+
+        for (let ci = 0; ci < candidates.length; ci++) {
+          if (linkCounts[i] >= MAX_LINKS_PER_NODE) break;
+          const j = candidates[ci].j;
+          if (linkCounts[j] >= MAX_LINKS_PER_NODE) continue;
+
+          const aIdx = i < j ? i : j;
+          const bIdx = i < j ? j : i;
+          const key = `${aIdx}|${bIdx}`;
+          if (edgeSet.has(key)) continue;
+
+          const d = Math.sqrt(candidates[ci].d2);
+          const k = 1 - d / LINK_DIST;
+          if (k < 0.025) continue;
+
+          edgeSet.add(key);
+          linkCounts[i]++;
+          linkCounts[j]++;
+          const depth = Math.round((particles[aIdx].depth + particles[bIdx].depth) * 0.5);
+          links.push({ a: aIdx, b: bIdx, alpha: 0, targetAlpha: 0, phase: Math.random() * Math.PI * 2, depth });
+        }
+      }
+
+      // Ensure each interior particle has minimum links.
+      for (let i = 0; i < INTERIOR_COUNT; i++) {
+        const a = particles[i];
+        while (linkCounts[i] < MIN_LINKS_PER_NODE) {
+          let bestJ = -1;
+          let bestD2 = Infinity;
+          for (let j = 0; j < INTERIOR_COUNT; j++) {
+            if (j === i) continue;
+            const b = particles[j];
+            if (linkCounts[j] >= MAX_LINKS_PER_NODE) continue;
+
+            const aIdx = i < j ? i : j;
+            const bIdx = i < j ? j : i;
+            const key = `${aIdx}|${bIdx}`;
+            if (edgeSet.has(key)) continue;
+
+            const dx = a.tx - b.tx;
+            const dy = a.ty - b.ty;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < bestD2) {
+              bestD2 = d2;
+              bestJ = j;
+            }
+          }
+
+          if (bestJ === -1) break;
+
+          const aIdx = i < bestJ ? i : bestJ;
+          const bIdx = i < bestJ ? bestJ : i;
+          const key = `${aIdx}|${bIdx}`;
+          const d = Math.sqrt(bestD2);
+          const k = Math.max(0.2, 1 - d / (LINK_DIST * 1.8));
+
+          edgeSet.add(key);
+          linkCounts[i]++;
+          linkCounts[bestJ]++;
+          const depth = Math.round((particles[aIdx].depth + particles[bIdx].depth) * 0.5);
+          links.push({ a: aIdx, b: bIdx, alpha: 0, targetAlpha: k, phase: Math.random() * Math.PI * 2, depth });
+        }
+      }
+    }
+
+    function updateInteriorNetwork(dt, elapsed) {
+      const softDist = LINK_DIST * 1.35;
+      const netReveal = ease((elapsed - NETWORK_REVEAL_START) / NETWORK_REVEAL_DUR);
+      for (let i = 0; i < links.length; i++) {
+        const l = links[i];
+        const a = particles[l.a];
+        const b = particles[l.b];
+
+        if (!a.born || !b.born) {
+          l.targetAlpha = 0;
+        } else {
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const d = Math.hypot(dx, dy);
+          const distFactor = Math.max(0, 1 - d / softDist);
+          l.targetAlpha = Math.min(a.alpha, b.alpha) * distFactor * netReveal;
+        }
+
+        const t = Math.min(1, dt * LINK_ALPHA_SMOOTH);
+        l.alpha += (l.targetAlpha - l.alpha) * t;
+      }
+    }
+
+    function drawInteriorNetwork(elapsed) {
+      const shimmer = 0.86 + Math.sin(elapsed * 2.2) * 0.14;
+      for (let layer = 0; layer <= 2; layer++) {
+        for (let i = 0; i < links.length; i++) {
+          const l = links[i];
+          if (l.depth !== layer || l.alpha < 0.01) continue;
+          const a = particles[l.a];
+          const b = particles[l.b];
+
+          const depthAlpha = DEPTH_LINK_ALPHA[layer];
+          const depthWidth = DEPTH_LINK_WIDTH[layer];
+          const al = l.alpha * shimmer * depthAlpha;
+          const mx = (a.x + b.x) * 0.5;
+          const my = (a.y + b.y) * 0.5;
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const len = Math.hypot(dx, dy) || 1;
+          const nx = -dy / len;
+          const ny = dx / len;
+          const wobble = Math.sin(elapsed * 3.8 + l.phase) * LINK_WOBBLE;
+          const flow = 0.68 + Math.sin(elapsed * LINK_FLOW_SPEED + l.phase * 1.7) * 0.32;
+          const pulse = 0.72 + Math.sin(elapsed * 6.3 + l.phase * 2.4) * 0.28;
+          const drift = Math.cos(elapsed * 4.6 + l.phase * 1.3) * LINK_DRIFT;
+          const tx = dx / len;
+          const ty = dy / len;
+          const cx2 = mx + nx * wobble + tx * drift;
+          const cy2 = my + ny * wobble + ty * drift;
+
+          const outerColor = layer === 0 ? '210,60,108' : layer === 1 ? '255,70,128' : '255,96,160';
+          const mainColor = layer === 0 ? '225,82,128' : layer === 1 ? '255,90,145' : '255,126,182';
+          const coreColor = layer === 0 ? '242,138,172' : layer === 1 ? '255,180,208' : '255,215,236';
+          const frontBoost = layer === 2 ? 1.16 : 1;
+
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.quadraticCurveTo(cx2, cy2, b.x, b.y);
+          ctx.strokeStyle = `rgba(${outerColor},${al * 0.28 * flow})`;
+          ctx.lineWidth = (1.95 + pulse * 0.16) * depthWidth * frontBoost;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.quadraticCurveTo(cx2, cy2, b.x, b.y);
+          ctx.strokeStyle = `rgba(${mainColor},${al * 0.5 * pulse})`;
+          ctx.lineWidth = (1.2 + pulse * 0.14) * depthWidth * frontBoost;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.quadraticCurveTo(cx2, cy2, b.x, b.y);
+          ctx.strokeStyle = `rgba(${coreColor},${al * 0.64 * flow})`;
+          ctx.lineWidth = (0.84 + pulse * 0.1) * depthWidth * frontBoost;
+          ctx.stroke();
+        }
+      }
+    }
+
+    function getContourPointCW(progress) {
+      const start = INTERIOR_COUNT;
+      const n = CONTOUR_COUNT;
+      const wrapped = ((progress % n) + n) % n;
+      const base = wrapped; // counter-clockwise direction
+      const i0 = Math.floor(base) % n;
+      const i1 = (i0 + 1) % n;
+      const frac = base - Math.floor(base);
+      const a = particles[start + i0];
+      const b = particles[start + i1];
+      return {
+        x: a.x + (b.x - a.x) * frac,
+        y: a.y + (b.y - a.y) * frac
+      };
+    }
+
+    function drawContourNeon(elapsed) {
+      if (!Number.isFinite(contourNeonStartAt) || elapsed < contourNeonStartAt) return;
+
+      const travel = (elapsed - contourNeonStartAt) * NEON_SPEED;
+      const head = contourStartIndex + travel;
+      const step = Math.max(0.5, NEON_TAIL_SPACING);
+      const maxSteps = Math.max(8, NEON_TAIL_STEPS);
+      const pinTailDistance = maxSteps * step;
+      const pulse = 0.9 + Math.sin(elapsed * 5.6) * 0.1;
+
+      // Strong neon sweep without a terminal "ball".
+      ctx.save();
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = 'rgba(255,140,198,0.95)';
+      ctx.shadowBlur = 16;
+
+      for (let band = 0; band < 4; band++) {
+        ctx.beginPath();
+        for (let i = 0; i <= maxSteps; i++) {
+          let pos = head - i * step;
+          if (travel < pinTailDistance && pos < contourStartIndex) {
+            pos = contourStartIndex;
+          }
+          const p = getContourPointCW(pos);
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+
+        if (band === 0) {
+          ctx.strokeStyle = `rgba(255,76,142,${0.48 * pulse})`;
+          ctx.lineWidth = 6.4;
+        } else if (band === 1) {
+          ctx.strokeStyle = `rgba(255,116,176,${0.72 * pulse})`;
+          ctx.lineWidth = 4.1;
+        } else if (band === 2) {
+          ctx.strokeStyle = `rgba(255,178,214,${0.96 * pulse})`;
+          ctx.lineWidth = 2.25;
+        } else {
+          ctx.strokeStyle = `rgba(255,238,246,${0.98 * pulse})`;
+          ctx.lineWidth = 1.2;
+        }
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+
+    function drawContourThread(elapsed) {
+      const contourStartAt = WAVE_START + CONTOUR_START;
+      if (elapsed <= contourStartAt) return;
+      const n = BND_FIXED.length; // 900
+      if (n < 2) return;
+
+      // Notch = i=0 (t=0, top center dip), Bottom = i=n/2 (t=PI, bottom tip)
+      // Each arc covers exactly n/2 points — perfect symmetry
+      const topIdx = 0;
+      const half = Math.floor(n / 2); // 450
+
+      const dur = CONTOUR_COUNT * CONTOUR_STEP;
+      const progress = Math.min(1, Math.max(0, (elapsed - contourStartAt) / dur));
+      if (progress <= 0) return;
+
+      const visible = Math.round(progress * half); // same for both arcs
+
+      function drawNeonLine(pts) {
+        if (pts.length < 2) return;
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        const passes = [
+          { blur: 20, color: 'rgba(255,50,105,0.28)', w: 11 },
+          { blur: 10, color: 'rgba(255,100,152,0.55)', w: 5 },
+          { blur: 4, color: 'rgba(255,162,200,0.80)', w: 2.2 },
+          { blur: 1, color: 'rgba(255,228,240,0.95)', w: 0.9 },
+        ];
+        for (const p of passes) {
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+          ctx.shadowColor = 'rgba(255,40,100,1)';
+          ctx.shadowBlur = p.blur;
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = p.w;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      if (progress >= 1) {
+        // Full closed heart — breathing neon, no dots
+        const glowStrength = Math.max(0.1, Math.min(1, ANIM.contour.glow));
+        const breathe = (0.82 + Math.sin(elapsed * 2.4) * 0.18) * glowStrength;
+        ctx.save();
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        const bp = [
+          { blur: 22, color: `rgba(255,50,110,${0.28 * breathe})`, w: 11 },
+          { blur: 11, color: `rgba(255,100,155,${0.55 * breathe})`, w: 5 },
+          { blur: 5, color: `rgba(255,162,202,${0.80 * breathe})`, w: 2.2 },
+          { blur: 2, color: `rgba(255,228,240,${0.95 * breathe})`, w: 0.9 },
+        ];
+        for (const p of bp) {
+          ctx.beginPath();
+          ctx.moveTo(BND_FIXED[0].x, BND_FIXED[0].y);
+          for (let i = 1; i < n; i++) ctx.lineTo(BND_FIXED[i].x, BND_FIXED[i].y);
+          ctx.closePath();
+          ctx.shadowColor = 'rgba(255,40,100,1)';
+          ctx.shadowBlur = p.blur;
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = p.w;
+          ctx.stroke();
+        }
+        ctx.restore();
+        return;
+      }
+
+      // CW arc: 0 → 1 → 2 → ... → visible  (right side going down)
+      const cwPts = [];
+      for (let k = 0; k <= visible; k++) cwPts.push(BND_FIXED[k]);
+
+      // CCW arc: 0 → n-1 → n-2 → ... → n-visible  (left side going down)
+      const ccwPts = [];
+      for (let k = 0; k <= visible; k++) ccwPts.push(BND_FIXED[(n - k) % n]);
+
+      drawNeonLine(cwPts);
+      drawNeonLine(ccwPts);
+    }
+
+    let segStart = 0;
+    let segEnd = 0;
+
+    let direction = 1; // 1 = сверху вниз, -1 = снизу вверх
+    let phase = 0;     // 0 = grow, 1 = shrink
+
+    function drawContourNeon(elapsed) {
+      if (!Number.isFinite(contourNeonStartAt) || elapsed < contourNeonStartAt) return;
+
+      const n = BND_FIXED.length;
+      const half = Math.floor(n / 2);
+      const speed = ANIM.sweep.sweepSpeed;
+
+      // --- ОБНОВЛЕНИЕ СОСТОЯНИЯ ---
+
+      if (phase === 0) {
+        // GROW
+        segEnd += speed;
+
+        if (segEnd >= half) {
+          segEnd = half;
+          phase = 1;
+        }
+      } else {
+        // SHRINK
+        segStart += speed;
+
+        if (segStart >= half) {
+          segStart = 0;
+          segEnd = 0;
+          phase = 0;
+          direction *= -1;
+        }
+      }
+
+      const start = Math.floor(segStart);
+      const end = Math.floor(segEnd);
+
+      if (end <= start) return;
+
+      const sweepPasses = [
+        { blur: 16, color: 'rgba(255,210,235,0.18)', w: 10 },
+        { blur: 7, color: 'rgba(255,235,248,0.50)', w: 3.8 },
+        { blur: 2, color: 'rgba(255,255,255,0.78)', w: 1.5 },
+        { blur: 0, color: 'rgba(255,255,255,0.96)', w: 0.6 },
+      ];
+
+      function draw(indices) {
+        if (indices.length < 2) return;
+
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        for (const p of sweepPasses) {
+          ctx.beginPath();
+          const first = BND_FIXED[indices[0]];
+          ctx.moveTo(first.x, first.y);
+
+          for (let i = 1; i < indices.length; i++) {
+            const pt = BND_FIXED[indices[i]];
+            ctx.lineTo(pt.x, pt.y);
+          }
+
+          ctx.shadowColor = 'rgba(255,255,255,0.85)';
+          ctx.shadowBlur = p.blur;
+          ctx.strokeStyle = p.color;
+          ctx.lineWidth = p.w;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+      }
+
+      const right = [];
+      const left = [];
+
+      for (let i = start; i <= end; i++) {
+        let idx;
+
+        if (direction === 1) {
+          idx = i; // сверху вниз
+        } else {
+          idx = half - i; // снизу вверх
+        }
+
+        right.push(idx);
+        left.push((n - idx) % n);
+      }
+
+      draw(right);
+      draw(left);
+    }
+
+    function frame() {
+      if (!started) return;
+      const now = Date.now();
+      const elapsed = (now - start) / 1000;
+      const dt = Math.min(0.05, (now - last) / 1000);
+      const animElapsed = elapsed * MAIN_TIME_SCALE;
+      const animDt = dt * MAIN_TIME_SCALE;
+      last = now;
+
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, W, H);
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const baseStart = WAVE_START + p.spawnAt;
+        const st = p.isContour
+          ? baseStart
+          : NETWORK_START + (p.spawnAt - INTERIOR_START);
+
+        if (animElapsed >= st && !p.born) {
+          p.born = true;
+          p.bornTime = animElapsed;
+        }
+
+        if (!p.born) continue;
+
+        p.alpha = ease((animElapsed - p.bornTime) / BIRTH_DUR);
+
+        let targetX = p.tx;
+        let targetY = p.ty;
+        if (!p.isContour) {
+          targetX += Math.cos(animElapsed * p.pulse + p.phase) * 0.8 * p.mirrorSign;
+          targetY += Math.sin(animElapsed * (p.pulse * 0.9) + p.phase) * 0.8;
+        }
+
+        const ax = (targetX - p.x) * SPRING;
+        const ay = (targetY - p.y) * SPRING;
+        p.vx = (p.vx + ax * animDt) * DAMPING;
+        p.vy = (p.vy + ay * animDt) * DAMPING;
+        p.x += p.vx * animDt;
+        p.y += p.vy * animDt;
+      }
+
+      updateInteriorNetwork(animDt, animElapsed);
+
+      if (!textStarted && animElapsed >= TEXT_START) {
+        startText(animElapsed);
+      }
+
+      ctx.save();
+      clipToHeartShape();
+      drawVolumeFog(animElapsed);
+      drawInteriorNetwork(animElapsed);
+      ctx.restore();
+      drawParticles();
+      drawContourThread(animElapsed);
+      drawContourNeon(animElapsed);
+      updateAndDrawWordDust(animElapsed);
+      requestAnimationFrame(frame);
+    }
+
+    function startExperience() {
+      if (started || startPending) return;
+      startPending = true;
+      bgMusic.currentTime = 0;
+      bgMusic.play().catch(() => { });
+      introEl.classList.add('exiting');
+
+      window.setTimeout(() => {
+        if (started) return;
+        introEl.classList.add('hidden');
+        preludeEl.classList.add('show');
+        prelude2El.classList.remove('show', 'done');
+        preludeWords.forEach((w) => w.classList.remove('visible'));
+        prelude2Words.forEach((w) => w.classList.remove('visible'));
+
+        const PRELUDE_STEP_1 = 560 / Math.max(0.1, ANIM.preludeFirst.speed);
+        const PRELUDE_STEP_2 = 560 / Math.max(0.1, ANIM.preludeSecond.speed);
+        const PRELUDE_FADE = 600;
+        const PRELUDE_HOLD = 420;
+        const wordsStartDelay = PRELUDE_WORDS_START_AT_SEC * 1000;
+        const words2StartDelay = PRELUDE2_WORDS_START_AT_SEC * 1000;
+        const prelude1End = wordsStartDelay + (preludeWords.length - 1) * PRELUDE_STEP_1 + PRELUDE_FADE + PRELUDE_HOLD;
+        const prelude2End = words2StartDelay + (prelude2Words.length - 1) * PRELUDE_STEP_2 + PRELUDE_FADE + PRELUDE_HOLD;
+        const preludeTotal = Math.max(prelude1End, prelude2End);
+
+        preludeWords.forEach((w, idx) => {
+          window.setTimeout(() => {
+            w.classList.add('visible');
+          }, wordsStartDelay + idx * PRELUDE_STEP_1);
+        });
+        prelude2Words.forEach((w, idx) => {
+          window.setTimeout(() => {
+            prelude2El.classList.add('show');
+            w.classList.add('visible');
+          }, words2StartDelay + idx * PRELUDE_STEP_2);
+        });
+
+        window.setTimeout(() => {
+          preludeEl.classList.add('done');
+        }, prelude1End);
+        window.setTimeout(() => {
+          prelude2El.classList.add('done');
+        }, prelude2End);
+
+        const mainStartDelay = Math.max(preludeTotal + 280, MAIN_ANIMATION_START_AT_SEC * 1000);
+        window.setTimeout(() => {
+          started = true;
+          preludeEl.classList.remove('show', 'done');
+          prelude2El.classList.remove('show', 'done');
+          resize();
+          frame();
+        }, mainStartDelay);
+      }, 560);
+    }
+
+    window.addEventListener('resize', resize);
+    startBtn.addEventListener('click', startExperience);
+  </script>
+</body>
+
+</html>

@@ -19,6 +19,7 @@
 
     canvas {
       display: block;
+      will-change: contents;
     }
 
     #intro {
@@ -317,17 +318,20 @@
     </button>
   </div>
   <div id="prelude" aria-hidden="true">
-    <span class="word">This</span>
-    <span class="word">is</span>
-    <span class="word">all</span>
-    <span class="word">for</span>
-    <span class="word accent">You</span>
+    <!-- data-delay = абсолютная задержка в мс от начала прелюди -->
+    <span class="word" data-delay="0">This</span>
+    <span class="word" data-delay="560">is</span>
+    <span class="word" data-delay="1120">all</span>
+    <span class="word" data-delay="1680">for</span>
+    <span class="word accent" data-delay="2240">You</span>
   </div>
   <div id="prelude2" aria-hidden="true">
-    <span class="word">You</span>
-    <span class="word">are</span>
-    <span class="word">my</span>
-    <span class="word accent">Shayla</span>
+    <!-- data-delay = абсолютная задержка в мс от начала прелюди -->
+    <span class="word" data-delay="0">You</span>
+    <span class="word" data-delay="560">are</span>
+    <span class="word" data-delay="1120">my</span>
+    <span class="word" data-delay="1680">beautiful</span>
+    <span class="word accent" data-delay="2240">Shayla</span>
   </div>
   <canvas id="c"></canvas>
   <div id="txt">
@@ -339,6 +343,10 @@
   <script>
     const canvas = document.getElementById('c');
     const ctx = canvas.getContext('2d');
+
+    // Mobile optimisation: cap pixel ratio to avoid 3x rendering on iPhone
+    const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    const DPR = IS_MOBILE ? Math.min(window.devicePixelRatio || 1, 1.5) : (window.devicePixelRatio || 1);
 
     let W = 0;
     let H = 0;
@@ -371,12 +379,16 @@
         sweepSpeed: 7, // speed of the white contour sweep (cycles per second)
       },
       preludeFirst: {
-        delay: 8.4,
-        speed: 1
+        delay: 8.4,       // seconds after click when first word appears
+        speed: 1,         // word fade-in speed (higher = faster)
+        interval: 560,    // ms between each word appearing
+        wordDelay: 0      // ms extra delay before first word (fine-tuning for music sync)
       },
       preludeSecond: {
-        delay: 17.21,
-        speed: 1
+        delay: 17.21,     // seconds after click when first word appears
+        speed: 1,         // word fade-in speed (higher = faster)
+        interval: 560,    // ms between each word appearing
+        wordDelay: 0      // ms extra delay before first word (fine-tuning for music sync)
       },
       main: {
         delay: 22.15,
@@ -385,8 +397,8 @@
     };
     window.ANIM = ANIM;
 
-    const INTERIOR_COUNT = 480;
-    const CONTOUR_COUNT = 260;
+    const INTERIOR_COUNT = IS_MOBILE ? 260 : 480;
+    const CONTOUR_COUNT = IS_MOBILE ? 180 : 260;
     const BIRTH_DUR = 1.05 / Math.max(0.1, ANIM.contour.speed);
     const SPRING = 10.5;
     const DAMPING = 0.86;
@@ -432,11 +444,20 @@
     }
 
     function resize() {
-      W = canvas.width = window.innerWidth;
-      H = canvas.height = window.innerHeight;
-      cx = W / 2;
-      cy = H / 2 - 70;
-      sc = Math.min(W, H) * 0.029;
+      const cssW = window.innerWidth;
+      const cssH = window.innerHeight;
+      W = canvas.width = Math.round(cssW * DPR);
+      H = canvas.height = Math.round(cssH * DPR);
+      canvas.style.width = cssW + 'px';
+      canvas.style.height = cssH + 'px';
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      cx = cssW / 2;
+      cy = cssH / 2 - 70;
+      // Heart formula spans ±16 units wide and ~18 units tall.
+      // Cap sc so the heart fits within the screen with some padding.
+      const scByW = (cssW * 0.46) / 16;
+      const scByH = (cssH * 0.44) / 18;
+      sc = Math.min(scByW, scByH);
       buildHeart();
       resetAnimation();
     }
@@ -980,7 +1001,7 @@
         } else {
           const dx = a.x - b.x;
           const dy = a.y - b.y;
-          const d = Math.hypot(dx, dy);
+          const d = Math.sqrt(dx * dx + dy * dy);
           const distFactor = Math.max(0, 1 - d / softDist);
           l.targetAlpha = Math.min(a.alpha, b.alpha) * distFactor * netReveal;
         }
@@ -992,36 +1013,74 @@
 
     function drawInteriorNetwork(elapsed) {
       const shimmer = 0.86 + Math.sin(elapsed * 2.2) * 0.14;
+
+      // Batch by layer and pass to minimise draw calls:
+      // Instead of 3 stroke() calls per link (= 3*N calls), we do 3 passes total.
+      // Each pass strokes ALL visible links in one path per layer — 9 draw calls total.
       for (let layer = 0; layer <= 2; layer++) {
+        const outerColor = layer === 0 ? '210,60,108' : layer === 1 ? '255,70,128' : '255,96,160';
+        const mainColor  = layer === 0 ? '225,82,128' : layer === 1 ? '255,90,145' : '255,126,182';
+        const coreColor  = layer === 0 ? '242,138,172' : layer === 1 ? '255,180,208' : '255,215,236';
+        const depthAlpha = DEPTH_LINK_ALPHA[layer];
+        const depthWidth = DEPTH_LINK_WIDTH[layer];
+        const frontBoost = layer === 2 ? 1.16 : 1;
+
+        // Collect visible links for this layer first
+        const visible = [];
         for (let i = 0; i < links.length; i++) {
           const l = links[i];
           if (l.depth !== layer || l.alpha < 0.01) continue;
+          visible.push(l);
+        }
+        if (visible.length === 0) continue;
+
+        // Pass 1 — outer glow (widest)
+        ctx.save();
+        ctx.lineWidth = (1.95 + 0.16) * depthWidth * frontBoost;
+        ctx.beginPath();
+        for (let i = 0; i < visible.length; i++) {
+          const l = visible[i];
           const a = particles[l.a];
           const b = particles[l.b];
-
-          const depthAlpha = DEPTH_LINK_ALPHA[layer];
-          const depthWidth = DEPTH_LINK_WIDTH[layer];
           const al = l.alpha * shimmer * depthAlpha;
           const mx = (a.x + b.x) * 0.5;
           const my = (a.y + b.y) * 0.5;
           const dx = b.x - a.x;
           const dy = b.y - a.y;
-          const len = Math.hypot(dx, dy) || 1;
+          const len = Math.sqrt(dx * dx + dy * dy) || 1;
           const nx = -dy / len;
           const ny = dx / len;
           const wobble = Math.sin(elapsed * 3.8 + l.phase) * LINK_WOBBLE;
           const flow = 0.68 + Math.sin(elapsed * LINK_FLOW_SPEED + l.phase * 1.7) * 0.32;
-          const pulse = 0.72 + Math.sin(elapsed * 6.3 + l.phase * 2.4) * 0.28;
           const drift = Math.cos(elapsed * 4.6 + l.phase * 1.3) * LINK_DRIFT;
-          const tx = dx / len;
-          const ty = dy / len;
-          const cx2 = mx + nx * wobble + tx * drift;
-          const cy2 = my + ny * wobble + ty * drift;
+          const tx2 = dx / len; const ty2 = dy / len;
+          const cx2 = mx + nx * wobble + tx2 * drift;
+          const cy2 = my + ny * wobble + ty2 * drift;
+          // store per-link computed values for reuse in passes 2 & 3
+          l._cx2 = cx2; l._cy2 = cy2; l._al = al; l._flow = flow;
+          l._pulse = 0.72 + Math.sin(elapsed * 6.3 + l.phase * 2.4) * 0.28;
+          ctx.moveTo(a.x, a.y);
+          ctx.quadraticCurveTo(cx2, cy2, b.x, b.y);
+        }
+        // Outer pass uses per-link alpha — must stroke individually (alpha varies per link)
+        // But we can at least skip shadowBlur which is the heaviest cost
+        ctx.restore();
 
-          const outerColor = layer === 0 ? '210,60,108' : layer === 1 ? '255,70,128' : '255,96,160';
-          const mainColor = layer === 0 ? '225,82,128' : layer === 1 ? '255,90,145' : '255,126,182';
-          const coreColor = layer === 0 ? '242,138,172' : layer === 1 ? '255,180,208' : '255,215,236';
-          const frontBoost = layer === 2 ? 1.16 : 1;
+        // Stroke individually but skip redundant state changes
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        // Disable shadow for inner passes on mobile — saves ~40% GPU time
+        if (!IS_MOBILE) { ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; }
+        for (let i = 0; i < visible.length; i++) {
+          const l = visible[i];
+          const a = particles[l.a];
+          const b = particles[l.b];
+          const al = l._al;
+          const pulse = l._pulse;
+          const flow = l._flow;
+          const cx2 = l._cx2;
+          const cy2 = l._cy2;
 
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
@@ -1044,6 +1103,7 @@
           ctx.lineWidth = (0.84 + pulse * 0.1) * depthWidth * frontBoost;
           ctx.stroke();
         }
+        ctx.restore();
       }
     }
 
@@ -1128,21 +1188,30 @@
 
       const visible = Math.round(progress * half); // same for both arcs
 
-      function drawNeonLine(pts) {
+      // Unified breathing — same formula for both animation and completed states
+      const glowStrength = Math.max(0.1, Math.min(1, ANIM.contour.glow));
+      const breathe = (0.82 + Math.sin(elapsed * 2.4) * 0.18) * glowStrength;
+
+      function drawNeonLine(pts, closed) {
         if (pts.length < 2) return;
         ctx.save();
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        const passes = [
-          { blur: 20, color: 'rgba(255,50,105,0.28)', w: 11 },
-          { blur: 10, color: 'rgba(255,100,152,0.55)', w: 5 },
-          { blur: 4, color: 'rgba(255,162,200,0.80)', w: 2.2 },
-          { blur: 1, color: 'rgba(255,228,240,0.95)', w: 0.9 },
+        // On mobile: skip the two heavy outer glow passes (blur 22 & 11) to save GPU
+        const passes = IS_MOBILE ? [
+          { blur: 5,  color: `rgba(255,162,202,${0.80 * breathe})`, w: 2.2 },
+          { blur: 1,  color: `rgba(255,228,240,${0.95 * breathe})`, w: 0.9 },
+        ] : [
+          { blur: 22, color: `rgba(255,50,110,${0.28 * breathe})`,  w: 11  },
+          { blur: 11, color: `rgba(255,100,155,${0.55 * breathe})`, w: 5   },
+          { blur: 5,  color: `rgba(255,162,202,${0.80 * breathe})`, w: 2.2 },
+          { blur: 2,  color: `rgba(255,228,240,${0.95 * breathe})`, w: 0.9 },
         ];
         for (const p of passes) {
           ctx.beginPath();
           ctx.moveTo(pts[0].x, pts[0].y);
           for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+          if (closed) ctx.closePath();
           ctx.shadowColor = 'rgba(255,40,100,1)';
           ctx.shadowBlur = p.blur;
           ctx.strokeStyle = p.color;
@@ -1153,29 +1222,8 @@
       }
 
       if (progress >= 1) {
-        // Full closed heart — breathing neon, no dots
-        const glowStrength = Math.max(0.1, Math.min(1, ANIM.contour.glow));
-        const breathe = (0.82 + Math.sin(elapsed * 2.4) * 0.18) * glowStrength;
-        ctx.save();
-        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-        const bp = [
-          { blur: 22, color: `rgba(255,50,110,${0.28 * breathe})`, w: 11 },
-          { blur: 11, color: `rgba(255,100,155,${0.55 * breathe})`, w: 5 },
-          { blur: 5, color: `rgba(255,162,202,${0.80 * breathe})`, w: 2.2 },
-          { blur: 2, color: `rgba(255,228,240,${0.95 * breathe})`, w: 0.9 },
-        ];
-        for (const p of bp) {
-          ctx.beginPath();
-          ctx.moveTo(BND_FIXED[0].x, BND_FIXED[0].y);
-          for (let i = 1; i < n; i++) ctx.lineTo(BND_FIXED[i].x, BND_FIXED[i].y);
-          ctx.closePath();
-          ctx.shadowColor = 'rgba(255,40,100,1)';
-          ctx.shadowBlur = p.blur;
-          ctx.strokeStyle = p.color;
-          ctx.lineWidth = p.w;
-          ctx.stroke();
-        }
-        ctx.restore();
+        // Full closed heart — same unified neon passes
+        drawNeonLine(BND_FIXED, true);
         return;
       }
 
@@ -1184,11 +1232,14 @@
       for (let k = 0; k <= visible; k++) cwPts.push(BND_FIXED[k]);
 
       // CCW arc: 0 → n-1 → n-2 → ... → n-visible  (left side going down)
+      // Skip index 0 (already in cwPts) to avoid double-rendering the notch point
       const ccwPts = [];
-      for (let k = 0; k <= visible; k++) ccwPts.push(BND_FIXED[(n - k) % n]);
+      for (let k = 1; k <= visible; k++) ccwPts.push(BND_FIXED[(n - k) % n]);
 
-      drawNeonLine(cwPts);
-      drawNeonLine(ccwPts);
+      // Draw as single merged path: ccw reversed + cw, so it's one continuous stroke from left tip → notch → right tip
+      // This prevents the neon glow from stacking double at the starting notch point
+      const mergedPts = [...ccwPts.slice().reverse(), ...cwPts];
+      drawNeonLine(mergedPts, false);
     }
 
     let segStart = 0;
@@ -1295,7 +1346,7 @@
       last = now;
 
       ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -1361,26 +1412,30 @@
         preludeWords.forEach((w) => w.classList.remove('visible'));
         prelude2Words.forEach((w) => w.classList.remove('visible'));
 
-        const PRELUDE_STEP_1 = 560 / Math.max(0.1, ANIM.preludeFirst.speed);
-        const PRELUDE_STEP_2 = 560 / Math.max(0.1, ANIM.preludeSecond.speed);
         const PRELUDE_FADE = 600;
         const PRELUDE_HOLD = 420;
-        const wordsStartDelay = PRELUDE_WORDS_START_AT_SEC * 1000;
-        const words2StartDelay = PRELUDE2_WORDS_START_AT_SEC * 1000;
-        const prelude1End = wordsStartDelay + (preludeWords.length - 1) * PRELUDE_STEP_1 + PRELUDE_FADE + PRELUDE_HOLD;
-        const prelude2End = words2StartDelay + (prelude2Words.length - 1) * PRELUDE_STEP_2 + PRELUDE_FADE + PRELUDE_HOLD;
+        const wordsStartDelay = PRELUDE_WORDS_START_AT_SEC * 1000 + ANIM.preludeFirst.wordDelay;
+        const words2StartDelay = PRELUDE2_WORDS_START_AT_SEC * 1000 + ANIM.preludeSecond.wordDelay;
+
+        // Читаем data-delay каждого слова (мс от начала прелюди)
+        const getDelay = (el) => parseFloat(el.dataset.delay || 0);
+        const maxDelay1 = Math.max(...Array.from(preludeWords).map(getDelay));
+        const maxDelay2 = Math.max(...Array.from(prelude2Words).map(getDelay));
+
+        const prelude1End = wordsStartDelay + maxDelay1 + PRELUDE_FADE + PRELUDE_HOLD;
+        const prelude2End = words2StartDelay + maxDelay2 + PRELUDE_FADE + PRELUDE_HOLD;
         const preludeTotal = Math.max(prelude1End, prelude2End);
 
-        preludeWords.forEach((w, idx) => {
+        preludeWords.forEach((w) => {
           window.setTimeout(() => {
             w.classList.add('visible');
-          }, wordsStartDelay + idx * PRELUDE_STEP_1);
+          }, wordsStartDelay + getDelay(w));
         });
-        prelude2Words.forEach((w, idx) => {
+        prelude2Words.forEach((w) => {
           window.setTimeout(() => {
             prelude2El.classList.add('show');
             w.classList.add('visible');
-          }, words2StartDelay + idx * PRELUDE_STEP_2);
+          }, words2StartDelay + getDelay(w));
         });
 
         window.setTimeout(() => {

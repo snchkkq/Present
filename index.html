@@ -2,7 +2,10 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&family=Great+Vibes&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&family=Great+Vibes&display=swap">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I Love You</title>
   <style>
@@ -19,7 +22,6 @@
 
     canvas {
       display: block;
-      will-change: contents;
     }
 
     #intro {
@@ -29,6 +31,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      background: radial-gradient(circle at 50% 40%, rgba(80, 5, 30, 0.60), rgba(0, 0, 0, 1) 58%);
       transition: opacity 480ms ease;
     }
 
@@ -136,8 +139,10 @@
       bottom: 40px;
       left: 0;
       width: 100%;
+      height: auto;
       pointer-events: none;
       overflow: visible;
+      display: block;
     }
 
     /* Each word group */
@@ -249,7 +254,7 @@
       <span class="word p1-part1" data-delay="0">This</span>
       <span class="word p1-part1" data-delay="480">is</span>
       <span class="word p1-part1" data-delay="960">all</span>
-      <span class="word p1-part1" data-delay="1470">for</span>
+      <span class="word p1-part1" data-delay="1420">for</span>
     </div>
     <div id="prelude-part2">
       <span class="word accent p1-part2" data-delay="0">You</span>
@@ -260,7 +265,7 @@
       <span class="word p2-part1" data-delay="0">You</span>
       <span class="word p2-part1" data-delay="250">are</span>
       <span class="word p2-part1" data-delay="820">my</span>
-      <span class="word p2-part1" data-delay="1250">beautiful</span>
+      <span class="word p2-part1" data-delay="1320">beautiful</span>
     </div>
     <div id="prelude2-part2">
       <span class="word accent p2-part2" data-delay="0">Shayla</span>
@@ -273,8 +278,8 @@
 
   <div id="txt" aria-label="I Love You">
     <span class="word highlight" data-delay="0">I</span>
-    <span class="word highlight" data-delay="1850">Love</span>
-    <span class="word highlight" data-delay="3500">You</span>
+    <span class="word highlight" data-delay="1450">Love</span>
+    <span class="word highlight" data-delay="2800">You</span>
   </div>
   <!-- Handwriting SVG for I Love You — populated by JS -->
   <svg id="iloveyou-svg" aria-hidden="true"></svg>
@@ -289,7 +294,7 @@
 
       // ── 🎬 ПРЕЛЮДИЯ 1: "This is all for" + "You" ───────────────────
       prelude1: {
-        startAt:        8.9,   // секунд от старта до появления первого слова
+        startAt:        8.78,   // секунд от старта до появления первого слова
         wordStagger:    520,   // мс между словами ("This" → "is" → "all" → "for")
         holdPart1:      400,   // мс удержания после последнего слова части 1
         overlapPart2:   200,   // мс — насколько раньше появляется "You" (перекрытие)
@@ -300,7 +305,7 @@
 
       // ── 🎬 ПРЕЛЮДИЯ 2: "You are my beautiful" + "Shayla" ───────────
       prelude2: {
-        startAt:        17.22, // секунд от старта
+        startAt:        17.35, // секунд от старта
         wordStagger:    380,   // мс между словами
         holdPart1:      400,   // мс удержания части 1
         overlapPart2:   200,   // мс перекрытия с "Shayla"
@@ -311,7 +316,7 @@
 
       // ── 💎 PARTICLE NETWORK ─────────────────────────────────────────
       network: {
-        startAt:        8.7,   // секунд — когда начинается BFS-волна
+        startAt:        8.9,   // секунд — когда начинается BFS-волна
         bfsSpeed:       0.25,   // скорость волны (1.0 = нормально, 2.0 = вдвое быстрее)
         linkDist:       68,    // макс. расстояние между точками для создания связи (px)
         particleCount:  700,   // кол-во точек внутри (мобайл: 340)
@@ -322,27 +327,27 @@
 
       // ── 💓 ПУЛЬСИРУЮЩЕЕ СЕРДЦЕ ──────────────────────────────────────
       pulse: {
-        startAt:        19.8,
+        startAt:        20,
         interval:       1.35,  // секунд между ударами
         beatDur:        0.18,  // секунд — длительность одного удара
         waveSpeed:      320,   // px/сек — скорость волны от верхушки вниз
-        waveDur:        1,  // секунд — как долго светится вспышка на точке/линии
-        heartScale:     0.25,  // размер сердечка (доля от sc — масштаба формулы)
+        waveDur:        0.45,  // секунд — как долго светится вспышка на точке/линии
+        heartScale:     0.20,  // размер сердечка (доля от sc — масштаба формулы)
       },
 
       // ── 💬 "I LOVE YOU" ─────────────────────────────────────────────
       iLoveYou: {
-        startAt:        14.9,  // секунд — когда начинает появляться "I"
-        delayLove:      1.78,  // секунд после startAt — задержка "Love"
-        delayYou:       3.45,  // секунд после startAt — задержка "You"
-        drawSpeed:      1.1,   // базовая скорость рисования буквы (секунды для "I")
+        startAt:        13,  // секунд — когда начинает появляться "I"
+        delayLove:      1.45,  // секунд после startAt — задержка "Love"
+        delayYou:       3,  // секунд после startAt — задержка "You"
+        drawSpeed:      1,   // базовая скорость рисования буквы (секунды для "I")
         glowDur:        0.9,   // секунд — нарастание неонового свечения
       },
 
       // ── ⏱ КОНТУР СЕРДЦА ─────────────────────────────────────────────
       contour: {
-        startAt:        0.30,  // секунд — задержка перед рисованием контура
-        speed:          0.26,  // скорость рисования контура
+        startAt:        0.45,  // секунд — задержка перед рисованием контура
+        speed:          0.27,  // скорость рисования контура
         glow:           5,     // яркость свечения контура после завершения
       },
 
@@ -374,9 +379,10 @@
     resizePreludeCanvas();
     window.addEventListener('resize', resizePreludeCanvas);
 
-    // Mobile optimisation: cap pixel ratio to avoid 3x rendering on iPhone
+    // Mobile optimisation: cap pixel ratio for main canvas (performance), but use full DPR for text
     const IS_MOBILE = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    const DPR = IS_MOBILE ? Math.min(window.devicePixelRatio || 1, 1.5) : (window.devicePixelRatio || 1);
+    const DPR = IS_MOBILE ? Math.min(window.devicePixelRatio || 1, 2) : (window.devicePixelRatio || 1);
+    const TEXT_DPR = window.devicePixelRatio || 1; // full DPR for sharp text on retina
 
     let W = 0;
     let H = 0;
@@ -794,23 +800,44 @@
       if (ilyBuilt) return;
       ilyBuilt = true;
 
-      // Measure each word width using offscreen canvas
+      const screenW = window.innerWidth;
+      // Smaller font on mobile so all 3 words fit in one line
+      const fontSize = Math.round(IS_MOBILE
+        ? Math.max(32, Math.min(54, screenW * 0.058))
+        : Math.max(42, Math.min(88, screenW * 0.078)));
+
+      // Measure each word width using offscreen canvas — after fonts loaded
       const off = document.createElement('canvas').getContext('2d');
-      off.font = ILY_FONT;
-      const GAP   = off.measureText(' ').width * 0.9;
+      off.font = `400 ${fontSize}px 'Great Vibes', cursive`;
+      const GAP   = off.measureText(' ').width * 1.1;
       const words  = ILY_WORDS.map(w => ({ ...w, width: off.measureText(w.text).width }));
       const totalW = words.reduce((s, w) => s + w.width, 0) + GAP * (words.length - 1);
 
-      const svgH   = Math.round(Math.max(64, Math.min(110, window.innerWidth * 0.095)));
-      const svgY   = svgH * 0.78; // baseline
+      // If text overflows screen, scale it down
+      const scale  = totalW > screenW * 0.92 ? (screenW * 0.92) / totalW : 1;
+      const scaledFontSize = Math.round(fontSize * scale);
 
-      ilySvg.setAttribute('viewBox', `0 0 ${window.innerWidth} ${svgH}`);
+      // Re-measure with scaled font if needed
+      let finalWords = words;
+      if (scale < 1) {
+        off.font = `400 ${scaledFontSize}px 'Great Vibes', cursive`;
+        const gapS = off.measureText(' ').width * 1.1;
+        finalWords = ILY_WORDS.map(w => ({ ...w, width: off.measureText(w.text).width, gap: gapS }));
+      }
+      const finalGAP   = scale < 1 ? finalWords[0].gap : GAP;
+      const finalTotalW = finalWords.reduce((s, w) => s + w.width, 0) + finalGAP * (finalWords.length - 1);
+      const finalSize   = scale < 1 ? scaledFontSize : fontSize;
+
+      const svgH   = Math.round(finalSize * 1.6);
+      const svgY   = Math.round(finalSize * 1.15);
+
+      ilySvg.setAttribute('viewBox', `0 0 ${screenW} ${svgH}`);
       ilySvg.setAttribute('height', svgH);
+      ilySvg.style.width = '100%';
 
-      let curX = (window.innerWidth - totalW) / 2;
+      let curX = (screenW - finalTotalW) / 2;
 
-      words.forEach((w, wi) => {
-        // Estimate path length from char count + width (rough but effective)
+      finalWords.forEach((w, wi) => {
         const pathLen   = w.width * 3.2 + w.text.length * 22;
         const drawDur   = ILY_DRAW_BASE * (0.7 + w.text.length * 0.22);
 
@@ -818,7 +845,7 @@
         g.classList.add('ily-word');
         g.style.opacity = '0';
 
-        const fontSize = Math.round(Math.max(42, Math.min(88, window.innerWidth * 0.078)));
+        const fontSize = finalSize;
 
         function makeText(sw, strokeColor, dashArr, dashOff) {
           const el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
@@ -868,7 +895,13 @@
 
     function startText(elapsed) {
       textStarted = true;
-      buildIlySvg();
+      // Wait for Great Vibes font before building SVG — prevents pixelated fallback font
+      const build = () => buildIlySvg();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(build);
+      } else {
+        build();
+      }
 
       // Compute line timing from last word
       const lastWord     = ILY_WORDS[ILY_WORDS.length - 1];
@@ -1627,13 +1660,7 @@
     // Font: Raleway — thin for normal words, bold for accent.
     // Animation: word-by-word fade-in, breathing hold, fade-out.
 
-    // Inject Raleway + Great Vibes from Google Fonts
-    (function() {
-      const link = document.createElement('link');
-      link.rel  = 'stylesheet';
-      link.href = 'https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&family=Great+Vibes&display=swap';
-      document.head.appendChild(link);
-    })();
+    // Fonts already preloaded in <head>
 
     const NEON_FONT_NORMAL = () => `700 ${Math.round(Math.max(28, Math.min(58, window.innerWidth * 0.054)))}px 'Raleway', sans-serif`;
     const NEON_FONT_ACCENT = () => `700 ${Math.round(Math.max(38, Math.min(80, window.innerWidth * 0.07)))}px 'Raleway', sans-serif`;
@@ -1722,6 +1749,8 @@
     function drawNeonWord(word, alpha, elapsed) {
       if (alpha <= 0.005) return;
       pCtx.save();
+      pCtx.imageSmoothingEnabled = true;
+      pCtx.imageSmoothingQuality = 'high';
       pCtx.font         = word.font;
       pCtx.textAlign    = 'center';
       pCtx.textBaseline = 'middle';

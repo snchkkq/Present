@@ -29,7 +29,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: radial-gradient(circle at 50% 40%, rgba(80, 5, 30, 0.60), rgba(0, 0, 0, 1) 58%);
       transition: opacity 480ms ease;
     }
 
@@ -141,7 +140,7 @@
       overflow: visible;
     }
 
-    /* Each word group: draw stroke then glow fills in */
+    /* Each word group */
     .ily-word {
       opacity: 0;
     }
@@ -149,33 +148,17 @@
     /* The neon stroke that draws itself */
     .ily-stroke {
       fill: none;
-      stroke: rgba(255, 110, 180, 1);
       stroke-linecap: round;
       stroke-linejoin: round;
-      filter: drop-shadow(0 0 6px rgba(255,60,150,1)) drop-shadow(0 0 14px rgba(255,20,110,0.85));
     }
 
-    /* The fill that fades in after stroke is done */
-    .ily-fill {
-      fill: none;
-      stroke: rgba(255, 230, 245, 0.92);
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      stroke-width: 0.6;
-      opacity: 0;
-      filter: drop-shadow(0 0 3px rgba(255,200,230,0.9));
-    }
+    .ily-fill { display: none; }
 
     @keyframes ilyDraw {
-      from { stroke-dashoffset: var(--dash-len); opacity: 1; }
-      to   { stroke-dashoffset: 0;               opacity: 1; }
+      from { stroke-dashoffset: var(--dash-len); }
+      to   { stroke-dashoffset: 0; }
     }
     @keyframes ilyGlow {
-      0%   { opacity: 0; filter: drop-shadow(0 0 18px rgba(255,60,150,0.9)) drop-shadow(0 0 40px rgba(220,20,90,0.7)); }
-      40%  { opacity: 1; filter: drop-shadow(0 0 14px rgba(255,80,160,1))   drop-shadow(0 0 30px rgba(220,30,100,0.8)); }
-      100% { opacity: 1; filter: drop-shadow(0 0 10px rgba(255,100,170,0.9)) drop-shadow(0 0 22px rgba(200,20,80,0.55)) drop-shadow(0 0 3px rgba(255,255,255,0.8)); }
-    }
-    @keyframes ilyFillIn {
       from { opacity: 0; }
       to   { opacity: 1; }
     }
@@ -264,9 +247,9 @@
   <div id="prelude" aria-hidden="true">
     <div id="prelude-part1">
       <span class="word p1-part1" data-delay="0">This</span>
-      <span class="word p1-part1" data-delay="420">is</span>
-      <span class="word p1-part1" data-delay="840">all</span>
-      <span class="word p1-part1" data-delay="1260">for</span>
+      <span class="word p1-part1" data-delay="480">is</span>
+      <span class="word p1-part1" data-delay="960">all</span>
+      <span class="word p1-part1" data-delay="1420">for</span>
     </div>
     <div id="prelude-part2">
       <span class="word accent p1-part2" data-delay="0">You</span>
@@ -275,9 +258,9 @@
   <div id="prelude2" aria-hidden="true">
     <div id="prelude2-part1">
       <span class="word p2-part1" data-delay="0">You</span>
-      <span class="word p2-part1" data-delay="320">are</span>
-      <span class="word p2-part1" data-delay="780">my</span>
-      <span class="word p2-part1" data-delay="1180">beautiful</span>
+      <span class="word p2-part1" data-delay="250">are</span>
+      <span class="word p2-part1" data-delay="820">my</span>
+      <span class="word p2-part1" data-delay="1250">beautiful</span>
     </div>
     <div id="prelude2-part2">
       <span class="word accent p2-part2" data-delay="0">Shayla</span>
@@ -306,30 +289,30 @@
 
       // ── 🎬 ПРЕЛЮДИЯ 1: "This is all for" + "You" ───────────────────
       prelude1: {
-        startAt:        8.9,   // секунд от старта до появления первого слова
-        wordStagger:    420,   // мс между словами ("This" → "is" → "all" → "for")
-        holdPart1:      250,   // мс удержания после последнего слова части 1
-        overlapPart2:   150,   // мс — насколько раньше появляется "You" (перекрытие)
+        startAt:        8.5,   // секунд от старта до появления первого слова
+        wordStagger:    520,   // мс между словами ("This" → "is" → "all" → "for")
+        holdPart1:      400,   // мс удержания после последнего слова части 1
+        overlapPart2:   200,   // мс — насколько раньше появляется "You" (перекрытие)
         holdPart2:      1200,  // мс удержания слова "You"
-        fadeIn:         0.52,  // секунд — скорость появления каждого слова
+        fadeIn:         0.40,  // секунд — скорость появления каждого слова
         fadeOut:        0.40,  // секунд — скорость исчезновения
       },
 
       // ── 🎬 ПРЕЛЮДИЯ 2: "You are my beautiful" + "Shayla" ───────────
       prelude2: {
-        startAt:        17.60, // секунд от старта
+        startAt:        17.20, // секунд от старта
         wordStagger:    380,   // мс между словами
-        holdPart1:      300,   // мс удержания части 1
-        overlapPart2:   180,   // мс перекрытия с "Shayla"
+        holdPart1:      400,   // мс удержания части 1
+        overlapPart2:   200,   // мс перекрытия с "Shayla"
         holdPart2:      1200,  // мс удержания "Shayla"
-        fadeIn:         0.52,
+        fadeIn:         0.40,
         fadeOut:        0.40,
       },
 
       // ── 💎 PARTICLE NETWORK ─────────────────────────────────────────
       network: {
-        startAt:        8.5,   // секунд — когда начинается BFS-волна
-        bfsSpeed:       0.5,   // скорость волны (1.0 = нормально, 2.0 = вдвое быстрее)
+        startAt:        8.7,   // секунд — когда начинается BFS-волна
+        bfsSpeed:       0.25,   // скорость волны (1.0 = нормально, 2.0 = вдвое быстрее)
         linkDist:       68,    // макс. расстояние между точками для создания связи (px)
         particleCount:  700,   // кол-во точек внутри (мобайл: 340)
         contourCount:   260,   // кол-во точек по контуру (мобайл: 180)
@@ -339,11 +322,12 @@
 
       // ── 💓 ПУЛЬСИРУЮЩЕЕ СЕРДЦЕ ──────────────────────────────────────
       pulse: {
+        startAt:        19.8,
         interval:       1.35,  // секунд между ударами
         beatDur:        0.18,  // секунд — длительность одного удара
         waveSpeed:      320,   // px/сек — скорость волны от верхушки вниз
         waveDur:        0.45,  // секунд — как долго светится вспышка на точке/линии
-        heartScale:     0.13,  // размер сердечка (доля от sc — масштаба формулы)
+        heartScale:     0.25,  // размер сердечка (доля от sc — масштаба формулы)
       },
 
       // ── 💬 "I LOVE YOU" ─────────────────────────────────────────────
@@ -477,17 +461,11 @@
     let BND_TOP_IDX = 0;
 
     // ── PULSE HEART ──────────────────────────────────────────────────
-    const PULSE_INTERVAL   = CONFIG.pulse.interval;
-    const PULSE_BEAT_DUR   = CONFIG.pulse.beatDur;
-    const PULSE_WAVE_SPEED = CONFIG.pulse.waveSpeed;
-    const PULSE_WAVE_DUR   = CONFIG.pulse.waveDur;
-    let   pulseBeats       = [];    // { time: animElapsed when beat fired }
-    // per-particle: pulseFlash[i] = animElapsed when wave arrived
-    const pulseFlash       = {};
-    // per-link: linkFlash[i] = animElapsed when wave lit this link
-    const linkFlash        = {};
-    let   lastBeatTime     = -999;
-    let   pulseActive      = false; // starts when network is revealed
+    const PULSE_INTERVAL = CONFIG.pulse.interval;
+    const PULSE_BEAT_DUR = CONFIG.pulse.beatDur;
+    let   pulseBeats     = [];   // { time: animElapsed when beat fired }
+    let   lastBeatTime   = -999;
+    let   pulseActive    = false;
 
     function pickDepthLayer() {
       const r = Math.random();
@@ -796,7 +774,7 @@
     // a pen drawing each word. After drawing, a neon glow fades in.
 
     const ilySvg   = document.getElementById('iloveyou-svg');
-    const ILY_FONT = `700 ${Math.round(Math.max(32, Math.min(72, window.innerWidth * 0.062)))}px 'Raleway', sans-serif`;
+    const ILY_FONT = `400 ${Math.round(Math.max(42, Math.min(88, window.innerWidth * 0.078)))}px 'Great Vibes', cursive`;
 
     // Word definitions: text + delay from TEXT_START (seconds)
     const ILY_WORDS = [
@@ -823,8 +801,8 @@
       const words  = ILY_WORDS.map(w => ({ ...w, width: off.measureText(w.text).width }));
       const totalW = words.reduce((s, w) => s + w.width, 0) + GAP * (words.length - 1);
 
-      const svgH   = Math.round(Math.max(48, Math.min(90, window.innerWidth * 0.075)));
-      const svgY   = svgH * 0.82; // baseline
+      const svgH   = Math.round(Math.max(64, Math.min(110, window.innerWidth * 0.095)));
+      const svgY   = svgH * 0.78; // baseline
 
       ilySvg.setAttribute('viewBox', `0 0 ${window.innerWidth} ${svgH}`);
       ilySvg.setAttribute('height', svgH);
@@ -833,50 +811,56 @@
 
       words.forEach((w, wi) => {
         // Estimate path length from char count + width (rough but effective)
-        const pathLen   = w.width * 2.6 + w.text.length * 18;
-        const drawDur   = ILY_DRAW_BASE * (0.7 + w.text.length * 0.18);
+        const pathLen   = w.width * 3.2 + w.text.length * 22;
+        const drawDur   = ILY_DRAW_BASE * (0.7 + w.text.length * 0.22);
 
         const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.classList.add('ily-word');
         g.style.opacity = '0';
 
-        // Neon stroke layer (draws itself)
-        const strokeEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        strokeEl.classList.add('ily-stroke');
-        strokeEl.setAttribute('x', curX + w.width / 2);
-        strokeEl.setAttribute('y', svgY);
-        strokeEl.setAttribute('text-anchor', 'middle');
-        strokeEl.setAttribute('font', ILY_FONT);
-        strokeEl.setAttribute('font-family', "'Raleway', sans-serif");
-        strokeEl.setAttribute('font-weight', '700');
-        strokeEl.setAttribute('font-size', Math.round(Math.max(32, Math.min(72, window.innerWidth * 0.062))));
-        strokeEl.setAttribute('stroke-width', wi === 2 ? '1.8' : '1.4'); // "You" slightly thicker
-        strokeEl.style.setProperty('--dash-len', pathLen);
-        strokeEl.style.strokeDasharray  = pathLen;
-        strokeEl.style.strokeDashoffset = pathLen;
-        strokeEl.textContent = w.text;
+        const fontSize = Math.round(Math.max(42, Math.min(88, window.innerWidth * 0.078)));
 
-        // Hairline fill layer (fades in when stroke is ~70% done)
-        const fillEl = strokeEl.cloneNode(true);
-        fillEl.classList.remove('ily-stroke');
-        fillEl.classList.add('ily-fill');
-        fillEl.style.strokeDasharray  = 'none';
-        fillEl.style.strokeDashoffset = '0';
-        // "You" gets pink fill stroke, others white
-        if (wi === 2) {
-          fillEl.setAttribute('stroke', 'rgba(255,160,210,0.9)');
-          fillEl.style.filter = 'drop-shadow(0 0 4px rgba(255,80,160,0.9))';
+        function makeText(sw, strokeColor, dashArr, dashOff) {
+          const el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          el.classList.add('ily-stroke');
+          el.setAttribute('x', curX + w.width / 2);
+          el.setAttribute('y', svgY);
+          el.setAttribute('text-anchor', 'middle');
+          el.setAttribute('font-family', "'Great Vibes', cursive");
+          el.setAttribute('font-weight', '400');
+          el.setAttribute('font-size', fontSize);
+          el.setAttribute('stroke-width', sw);
+          el.setAttribute('stroke', strokeColor);
+          el.setAttribute('fill', 'none');
+          el.setAttribute('stroke-linecap', 'round');
+          el.setAttribute('stroke-linejoin', 'round');
+          el.style.strokeDasharray  = dashArr;
+          el.style.strokeDashoffset = dashOff;
+          el.style.setProperty('--dash-len', pathLen);
+          el.textContent = w.text;
+          return el;
         }
 
+        // Layer 1 — ultra-thin pink glow (very subtle blur)
+        const glowEl = makeText('8', 'rgba(255,80,160,0.12)', pathLen, pathLen);
+        glowEl.style.filter = 'blur(4px)';
+
+        // Layer 2 — white core stroke (thin and clean)
+        const strokeEl = makeText('1.6', 'rgba(255,255,255,0.92)', pathLen, pathLen);
+
+        // Single minimal drop-shadow — just a faint pink halo
+        g.style.filter = 'drop-shadow(0 0 3px rgba(255,100,180,0.7))';
+
+        g.appendChild(glowEl);
         g.appendChild(strokeEl);
-        g.appendChild(fillEl);
         ilySvg.appendChild(g);
 
-        // Store timing data on element for JS trigger
         g.dataset.delaySec  = w.delaySec;
         g.dataset.drawDur   = drawDur;
         g.dataset.pathLen   = pathLen;
         g.dataset.triggered = '0';
+        g._strokeEls = [glowEl, strokeEl];
+        g._fillEl    = null;
 
         curX += w.width + GAP;
       });
@@ -907,25 +891,16 @@
         g.dataset.triggered = '1';
         const drawDur  = parseFloat(g.dataset.drawDur);
         const pathLen  = parseFloat(g.dataset.pathLen);
-        const strokeEl = g.querySelector('.ily-stroke');
-        const fillEl   = g.querySelector('.ily-fill');
+        const strokeEls = g._strokeEls || [g.querySelector('.ily-stroke')];
+        const fillEl   = g._fillEl || g.querySelector('.ily-fill');
 
         // Reveal group
-        g.style.opacity   = '1';
+        g.style.opacity = '1';
 
-        // Animate stroke drawing
-        strokeEl.style.animation = `ilyDraw ${drawDur}s cubic-bezier(0.4, 0, 0.3, 1) forwards`;
-
-        // Glow intensifies as stroke completes
-        strokeEl.style.animationFillMode = 'forwards';
-
-        // After stroke: glow pulse + hairline fill
-        setTimeout(() => {
-          strokeEl.style.animation = `ilyDraw ${drawDur}s cubic-bezier(0.4,0,0.3,1) forwards, ilyGlow ${ILY_GLOW_DUR}s ease forwards`;
-          setTimeout(() => {
-            fillEl.style.animation = `ilyFillIn ${ILY_FILL_DUR}s ease forwards`;
-          }, ILY_GLOW_DUR * 500);
-        }, drawDur * 1000 * 0.85);
+        // Animate both stroke layers drawing simultaneously
+        strokeEls.forEach(el => {
+          el.style.animation = `ilyDraw ${drawDur}s cubic-bezier(0.4, 0, 0.3, 1) forwards`;
+        });
       });
 
       // Line underline trigger
@@ -1499,148 +1474,77 @@
     function drawPulseHeart(animElapsed) {
       if (!pulseActive) return;
 
-      // Find latest beat for scale animation
+      // Compute beat phase: double-thump (lub-dub)
       let beatPhase = 0;
-      if (pulseBeats.length > 0) {
-        const lastBeat = pulseBeats[pulseBeats.length - 1];
-        const dt = animElapsed - lastBeat.time;
-        if (dt < PULSE_BEAT_DUR * 2.5) {
-          // double-thump: two quick beats like a real heart
-          const t1 = dt / PULSE_BEAT_DUR;
-          const t2 = (dt - PULSE_BEAT_DUR * 1.1) / PULSE_BEAT_DUR;
-          const b1 = t1 >= 0 && t1 < 1 ? Math.sin(t1 * Math.PI) : 0;
-          const b2 = t2 >= 0 && t2 < 1 ? Math.sin(t2 * Math.PI) * 0.65 : 0;
-          beatPhase = Math.max(b1, b2);
-        }
+      for (const beat of pulseBeats) {
+        const dt = animElapsed - beat.time;
+        if (dt < 0 || dt > PULSE_BEAT_DUR * 3) continue;
+        const b1 = (dt / PULSE_BEAT_DUR);
+        const b2 = ((dt - PULSE_BEAT_DUR * 1.15) / PULSE_BEAT_DUR);
+        const v1 = b1 >= 0 && b1 < 1 ? Math.sin(b1 * Math.PI) : 0;
+        const v2 = b2 >= 0 && b2 < 1 ? Math.sin(b2 * Math.PI) * 0.6 : 0;
+        beatPhase = Math.max(beatPhase, v1, v2);
       }
 
       const baseScale = CONFIG.pulse.heartScale;
-      const beatScale = baseScale * (1 + beatPhase * 0.38);
-      const hSc = sc * beatScale;
+      const hSc = sc * (baseScale + beatPhase * baseScale * 0.35);
+      const SEGS = IS_MOBILE ? 48 : 80;
 
-      // Draw small heart using hx/hy parametric formula
-      const SEGS = 80;
+      // Build heart path once
       ctx.save();
       ctx.translate(cx, cy);
-
-      // Outer glow passes
-      const glow = 0.75 + beatPhase * 0.55;
-      const passes = [
-        { blur: 28 + beatPhase * 18, color: `rgba(255,20,100,${0.22 * glow})`,  lw: 6  },
-        { blur: 14 + beatPhase * 10, color: `rgba(255,60,140,${0.45 * glow})`,  lw: 3.5},
-        { blur: 6,                   color: `rgba(255,100,170,${0.85 * glow})`,  lw: 1.8},
-        { blur: 2,                   color: `rgba(255,220,240,${0.95 * glow})`,  lw: 0.8},
-      ];
-
-      for (const p of passes) {
-        ctx.beginPath();
-        for (let i = 0; i <= SEGS; i++) {
-          const t = (i / SEGS) * Math.PI * 2;
-          const x = hx(t) * hSc;
-          const y = hy(t) * hSc;
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-        ctx.shadowColor = 'rgba(255,0,100,1)';
-        ctx.shadowBlur  = p.blur;
-        ctx.strokeStyle = p.color;
-        ctx.lineWidth   = p.lw;
-        ctx.stroke();
-      }
-
-      // Soft pink fill (semi-transparent)
       ctx.beginPath();
       for (let i = 0; i <= SEGS; i++) {
         const t = (i / SEGS) * Math.PI * 2;
-        const x = hx(t) * hSc;
-        const y = hy(t) * hSc;
+        const x = hx(t) * hSc, y = hy(t) * hSc;
         i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
       ctx.closePath();
-      ctx.fillStyle = `rgba(255,20,80,${0.08 + beatPhase * 0.12})`;
-      ctx.shadowBlur = 0;
+
+      // Glow intensity: resting + beat flash
+      const glow = 0.7 + beatPhase * 0.3;
+
+      // Soft fill
+      ctx.fillStyle = `rgba(255,20,80,${0.07 + beatPhase * 0.13})`;
       ctx.fill();
 
+      // Single stroke pass — shadowBlur drives the glow
+      // On mobile: one pass only, no nested loops
+      if (IS_MOBILE) {
+        ctx.shadowColor = 'rgba(255,30,100,1)';
+        ctx.shadowBlur  = 18 + beatPhase * 22;
+        ctx.strokeStyle = `rgba(255,80,160,${0.75 + beatPhase * 0.25})`;
+        ctx.lineWidth   = 1.4;
+        ctx.stroke();
+      } else {
+        // Desktop: two passes for richer glow
+        ctx.shadowColor = 'rgba(255,0,100,1)';
+        ctx.shadowBlur  = 40 + beatPhase * 30;
+        ctx.strokeStyle = `rgba(255,40,120,${0.4 * glow})`;
+        ctx.lineWidth   = 3.5;
+        ctx.stroke();
+
+        ctx.shadowBlur  = 10 + beatPhase * 12;
+        ctx.strokeStyle = `rgba(255,100,180,${0.9 * glow})`;
+        ctx.lineWidth   = 1.2;
+        ctx.stroke();
+      }
+
+      ctx.shadowBlur = 0;
       ctx.restore();
     }
-
-    // ── PULSE WAVE: spread from center particle outward ──────────────
+    // ── PULSE: простой updatePulse, вспышка glow в drawPulseHeart ──
     function updatePulse(animElapsed) {
       if (!pulseActive) return;
-
-      // Fire a new beat every PULSE_INTERVAL seconds
       if (animElapsed - lastBeatTime >= PULSE_INTERVAL) {
         lastBeatTime = animElapsed;
         pulseBeats.push({ time: animElapsed });
-        if (pulseBeats.length > 6) pulseBeats.shift();
-
-        // Wave originates from the top notch of the heart (BND_FIXED[BND_TOP_IDX])
-        const topX = BND_FIXED.length ? BND_FIXED[BND_TOP_IDX].x : cx;
-        const topY = BND_FIXED.length ? BND_FIXED[BND_TOP_IDX].y : (cy - sc * 0.5);
-
-        // Assign wave arrival time per particle based on distance from top notch
-        for (let i = 0; i < INTERIOR_COUNT; i++) {
-          const p = particles[i];
-          if (!p.born) continue;
-          const dx = p.tx - topX, dy = p.ty - topY;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          pulseFlash[i] = animElapsed + dist / PULSE_WAVE_SPEED;
-        }
-        // Assign wave arrival per link
-        for (let i = 0; i < links.length; i++) {
-          const l = links[i];
-          const a = particles[l.a], b = particles[l.b];
-          if (!a.born || !b.born) continue;
-          const mx = (a.tx + b.tx) / 2 - topX;
-          const my = (a.ty + b.ty) / 2 - topY;
-          const dist = Math.sqrt(mx*mx + my*my);
-          linkFlash[i] = animElapsed + dist / PULSE_WAVE_SPEED;
-        }
+        if (pulseBeats.length > 4) pulseBeats.shift();
       }
     }
 
-    // ── DRAW WAVE FLASH on particles & links ─────────────────────────
-    function drawPulseFlash(animElapsed) {
-      if (!pulseActive) return;
-
-      // Flash on particles
-      for (const [idxStr, arrivalTime] of Object.entries(pulseFlash)) {
-        const dt = animElapsed - arrivalTime;
-        if (dt < 0 || dt > PULSE_WAVE_DUR) continue;
-        const t     = dt / PULSE_WAVE_DUR;
-        const flash = Math.sin(t * Math.PI) * 0.9; // bell curve
-        const p     = particles[parseInt(idxStr)];
-        if (!p || !p.born) continue;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 3.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,180,220,${flash * 0.85})`;
-        ctx.shadowColor = 'rgba(255,80,160,1)';
-        ctx.shadowBlur  = 12;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-
-      // Flash on links
-      for (const [idxStr, arrivalTime] of Object.entries(linkFlash)) {
-        const dt = animElapsed - arrivalTime;
-        if (dt < 0 || dt > PULSE_WAVE_DUR) continue;
-        const t     = dt / PULSE_WAVE_DUR;
-        const flash = Math.sin(t * Math.PI);
-        const l     = links[parseInt(idxStr)];
-        if (!l) continue;
-        const a = particles[l.a], b = particles[l.b];
-        if (!a.born || !b.born) continue;
-        ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.strokeStyle = `rgba(255,150,210,${flash * 0.75})`;
-        ctx.lineWidth   = 1.8 + flash * 2.2;
-        ctx.shadowColor = 'rgba(255,60,140,1)';
-        ctx.shadowBlur  = 10 + flash * 14;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-      }
-    }
+    // drawPulseFlash — ничего не делает, эффект встроен в drawPulseHeart
+    function drawPulseFlash(animElapsed) {}
 
     function frame() {
       if (!started) return;
@@ -1696,8 +1600,8 @@
       // Schedule BFS rays once per frame (not in physics loop to avoid duplicates)
       scheduleBfsRays(animElapsed);
 
-      // Activate pulse once BFS wave is complete and network is visible
-      if (!pulseActive && animElapsed > NETWORK_START + BFS_TOTAL_DUR + 1.2) {
+      // Activate pulse — uses CONFIG.pulse.startAt as the minimum delay
+      if (!pulseActive && animElapsed > CONFIG.pulse.startAt) {
         pulseActive = true;
         lastBeatTime = animElapsed - PULSE_INTERVAL; // fire first beat immediately
       }
@@ -1723,11 +1627,11 @@
     // Font: Raleway — thin for normal words, bold for accent.
     // Animation: word-by-word fade-in, breathing hold, fade-out.
 
-    // Inject Raleway from Google Fonts
+    // Inject Raleway + Great Vibes from Google Fonts
     (function() {
       const link = document.createElement('link');
       link.rel  = 'stylesheet';
-      link.href = 'https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&display=swap';
+      link.href = 'https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&family=Great+Vibes&display=swap';
       document.head.appendChild(link);
     })();
 

@@ -244,6 +244,21 @@
       transform: translateY(0);
     }
 
+    /* Быстрое плавное исчезновение */
+    #prelude .word.fadeout,
+    #prelude2 .word.fadeout {
+      opacity: 0 !important;
+      transform: translateY(-6px) !important;
+      transition: opacity 180ms ease-in, transform 180ms ease-in !important;
+    }
+
+    /* Состояние visible+fadeout — нужно для корректного триггера анимации */
+    #prelude .word.visible.fadeout,
+    #prelude2 .word.visible.fadeout {
+      opacity: 0 !important;
+      transform: translateY(-6px) !important;
+    }
+
     #prelude .word.accent,
     #prelude2 .word.accent {
       color: rgba(255, 228, 240, 1);
@@ -307,6 +322,22 @@
       opacity: 1;
       transform: translateY(0);
     }
+
+    /* Каждая часть прелюди — отдельный центрированный блок */
+    #prelude-part1, #prelude-part2,
+    #prelude2-part1, #prelude2-part2 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    /* Часть 2 скрыта по умолчанию — управляется через слова .visible */
+    #prelude-part2, #prelude2-part2 {
+      pointer-events: none;
+    }
   </style>
 </head>
 
@@ -318,26 +349,33 @@
     </button>
   </div>
   <div id="prelude" aria-hidden="true">
-    <!-- data-delay = абсолютная задержка в мс от начала прелюди -->
-    <span class="word" data-delay="0">This</span>
-    <span class="word" data-delay="560">is</span>
-    <span class="word" data-delay="1120">all</span>
-    <span class="word" data-delay="1680">for</span>
-    <span class="word accent" data-delay="2180">You</span>
+    <div id="prelude-part1">
+      <span class="word p1-part1" data-delay="0">This</span>
+      <span class="word p1-part1" data-delay="560">is</span>
+      <span class="word p1-part1" data-delay="1120">all</span>
+      <span class="word p1-part1" data-delay="1680">for</span>
+    </div>
+    <div id="prelude-part2">
+      <span class="word accent p1-part2" data-delay="0">You</span>
+    </div>
   </div>
   <div id="prelude2" aria-hidden="true">
-    <!-- data-delay = абсолютная задержка в мс от начала прелюди -->
-    <span class="word" data-delay="50">You</span>
-    <span class="word" data-delay="200">are</span>
-    <span class="word" data-delay="850">my</span>
-    <span class="word" data-delay="1300">beautiful</span>
-    <span class="word accent" data-delay="1800">Shayla</span>
+    <div id="prelude2-part1">
+      <span class="word p2-part1" data-delay="50">You</span>
+      <span class="word p2-part1" data-delay="200">are</span>
+      <span class="word p2-part1" data-delay="850">my</span>
+      <span class="word p2-part1" data-delay="1300">beautiful</span>
+    </div>
+    <div id="prelude2-part2">
+      <span class="word accent p2-part2" data-delay="0">Shayla</span>
+    </div>
   </div>
   <canvas id="c"></canvas>
   <div id="txt">
-    <span class="word" style="--delay: 0ms;">I</span>
-    <span class="word" style="--delay: 190ms;">Love</span>
-    <span class="word" style="--delay: 380ms;">You</span>
+    <!-- data-delay = мс от момента TEXT_START до появления слова -->
+    <span class="word" data-delay="0">I</span>
+    <span class="word" data-delay="1850">Love</span>
+    <span class="word" data-delay="3500">You</span>
   </div>
 
   <script>
@@ -358,37 +396,48 @@
     const ANIM = {
       contour: {
         delay: 0.27, // seconds before contour starts drawing
-        speed: 0.5,  // drawing speed (higher = faster)
+        speed: 0.26,  // drawing speed (higher = faster)
         glow: 5   // brightness of the neon glow after contour is complete (0..1)
       },
       network: {
-        delay: -3.6,
-        speed: 10
+        delay: 8.5,
+        speed: 5
       },
       words: {
-        delay: 3,
-        speed: 2
+        delay: 13.5,
+        speed: 1
       },
       line: {
         delay: 0.5,
-        speed: 1
+        speed: 0.05
       },
       sweep: {
-        delay: 0.2,      // seconds after line before sweep starts
+        delay: -7,      // seconds after line before sweep starts
         speed: 40,       // speed of the existing orb sweep
         sweepSpeed: 7, // speed of the white contour sweep (cycles per second)
       },
       preludeFirst: {
-        delay: 8.4,       // seconds after click when first word appears
-        speed: 1,         // word fade-in speed (higher = faster)
-        interval: 560,    // ms between each word appearing
-        wordDelay: 0      // ms extra delay before first word (fine-tuning for music sync)
+        delay: 8.4,
+        speed: 1,
+        interval: 560,
+        wordDelay: 0,
+        part1HideAfter: 250,   // мс после последнего слова → начинается fade-out (0.2 сек интервал)
+        part2ShowAfter: 150,   // мс после начала fade-out → появляется "You" (пока часть1 исчезает)
+        part2HideAfter: 1200,
       },
       preludeSecond: {
-        delay: 17.21,     // seconds after click when first word appears
-        speed: 1,         // word fade-in speed (higher = faster)
-        interval: 560,    // ms between each word appearing
-        wordDelay: 0      // ms extra delay before first word (fine-tuning for music sync)
+        delay: 17.21,
+        speed: 1,
+        interval: 560,
+        wordDelay: 0,
+        part1HideAfter: 300,   // 0.1 сек интервал
+        part2ShowAfter: 180,
+        part2HideAfter: 1200,
+      },
+      iLoveYou: {
+        // data-delay на каждом слове управляет задержкой (мс от TEXT_START)
+        // Здесь можно задать базовую задержку перед первым словом
+        baseDelay: 0,  // мс дополнительной задержки перед "I"
       },
       main: {
         delay: 22.15,
@@ -399,7 +448,7 @@
 
     const INTERIOR_COUNT = IS_MOBILE ? 340 : 700;
     const CONTOUR_COUNT = IS_MOBILE ? 180 : 260;
-    const BIRTH_DUR = 1.05 / Math.max(0.1, ANIM.contour.speed);
+    const BIRTH_DUR = 0.25 / Math.max(0.1, ANIM.contour.speed);
     const SPRING = 10.5;
     const DAMPING = 0.86;
     const CONTOUR_START = ANIM.contour.delay;
@@ -411,10 +460,10 @@
     const boundary = [];
     let heartClipPath = null;
     const links = [];
-    const LINK_DIST = 42;
+    const LINK_DIST = 68;
     const LINK_DIST_SQ = LINK_DIST * LINK_DIST;
     const MIN_LINKS_PER_NODE = 2;
-    const MAX_LINKS_PER_NODE = 5;
+    const MAX_LINKS_PER_NODE = 6;
     const LINK_ALPHA_SMOOTH = 9;
     const LINK_WOBBLE = 4.5;
     const LINK_FLOW_SPEED = 9.0;
@@ -486,14 +535,13 @@
       const pairCount = Math.floor(INTERIOR_COUNT / 2);
       for (let i = 0; i < pairCount; i++) {
         const t = Math.random() * Math.PI * 2;
-        const r = Math.sqrt(Math.random()) * 0.965;
+        const r = Math.sqrt(Math.random()) * 0.998;
         const sx = hx(t) * sc * r;
         const txR = cx + Math.abs(sx);
         const txL = cx - Math.abs(sx);
         const ty = cy + hy(t) * sc * r;
-        const dy = ty - cy;
-        const radial = Math.sqrt(Math.abs(sx) * Math.abs(sx) + dy * dy) / (sc * 16);
-        const spawnAt = INTERIOR_START + (radial + (Math.random() - 0.5) * 0.06) * WAVE_DUR;
+        // Uniform spawn: частицы появляются равномерно в пределах WAVE_DUR
+        const spawnAt = Math.random() * WAVE_DUR;
         const size = 1.05 + Math.random() * 1.35;
         const phase = Math.random() * Math.PI * 2;
         const pulse = 0.5 + Math.random() * 0.9;
@@ -540,11 +588,10 @@
 
       if (INTERIOR_COUNT % 2 === 1) {
         const t = Math.random() * Math.PI * 2;
-        const r = Math.sqrt(Math.random()) * 0.965;
+        const r = Math.sqrt(Math.random()) * 0.998;
         const tx = cx;
         const ty = cy + hy(t) * sc * r;
-        const dy = ty - cy;
-        const spawnAt = INTERIOR_START + (Math.abs(dy) / (sc * 16) + (Math.random() - 0.5) * 0.06) * WAVE_DUR;
+        const spawnAt = Math.random() * WAVE_DUR;
         particles.push({
           x: cx,
           y: cy + (ty - cy) * 0.08,
@@ -651,17 +698,11 @@
 
     const WAVE_START = 0.3;
     const WAVE_DUR = 7.4 / Math.max(0.1, ANIM.network.speed);
-    const CONTOUR_END = WAVE_START + CONTOUR_START + CONTOUR_COUNT * CONTOUR_STEP;
-    const CONTOUR_FULLY_FORMED_AT = CONTOUR_END + BIRTH_DUR + 1.1;
-    const NETWORK_START = CONTOUR_FULLY_FORMED_AT + ANIM.network.delay;
-    const NETWORK_REVEAL_START = NETWORK_START + 0.55;
+    const NETWORK_START = ANIM.network.delay;
+    const NETWORK_REVEAL_START = NETWORK_START + 0.1;
     const NETWORK_REVEAL_DUR = 0.85 / Math.max(0.1, ANIM.network.speed);
-    const NETWORK_PARTICLES_DONE_AT = NETWORK_START + WAVE_DUR + BIRTH_DUR;
-    const NETWORK_LINKS_DONE_AT = NETWORK_REVEAL_START + NETWORK_REVEAL_DUR;
-    const NETWORK_FULLY_FORMED_AT = Math.max(NETWORK_PARTICLES_DONE_AT, NETWORK_LINKS_DONE_AT);
-    const TEXT_AFTER_NETWORK_SEC = ANIM.words.delay;
-    const TEXT_START = NETWORK_FULLY_FORMED_AT + TEXT_AFTER_NETWORK_SEC;
-    const NEON_SPEED = ANIM.sweep.speed; // contour points per second
+    const TEXT_START = ANIM.words.delay;
+    const NEON_SPEED = ANIM.sweep.speed;
     const NEON_TAIL_STEPS = 74;
     const NEON_TAIL_SPACING = 0.9;
     const CONTOUR_THREAD_ALPHA = 0.78;
@@ -689,25 +730,10 @@
     const PRELUDE_WORDS_START_AT_SEC = ANIM.preludeFirst.delay;
     const PRELUDE2_WORDS_START_AT_SEC = ANIM.preludeSecond.delay;
     const MAIN_ANIMATION_START_AT_SEC = ANIM.main.delay;
-    const MAIN_ANIMATION_END_AT_SEC = 50.0;
     const LINE_AFTER_LAST_WORD_SEC = ANIM.line.delay;
     const LINE_IN_DUR_SEC = 0.85 / Math.max(0.1, ANIM.line.speed);
     const NEON_AFTER_LINE_SEC = ANIM.sweep.delay;
-    const MAIN_ANIMATION_TARGET_DUR_SEC = MAIN_ANIMATION_END_AT_SEC - MAIN_ANIMATION_START_AT_SEC;
-    const MAIN_TEXT_CHAIN_NOMINAL_DUR_SEC =
-      (wordEls.length - 1) * WORD_STAGGER +
-      DUST_START_JITTER_MAX +
-      DUST_DUR * DUST_LIFE_MAX_FACTOR +
-      LINE_AFTER_LAST_WORD_SEC +
-      LINE_IN_DUR_SEC +
-      NEON_AFTER_LINE_SEC;
-    const MAIN_NOMINAL_END_SEC = TEXT_START + MAIN_TEXT_CHAIN_NOMINAL_DUR_SEC + (CONTOUR_COUNT / NEON_SPEED);
-    // < 1 slows the whole main scene down to avoid early finish.
-    const MAIN_TIME_STRETCH = ANIM.main.speed;
-    const MAIN_TIME_SCALE = Math.max(
-      0.2,
-      (MAIN_NOMINAL_END_SEC / Math.max(0.1, MAIN_ANIMATION_TARGET_DUR_SEC)) * MAIN_TIME_STRETCH
-    );
+    const MAIN_TIME_SCALE = Math.max(0.2, ANIM.main.speed);
 
     let physicsAccumulator = 0;
     const PHYSICS_STEP = 1 / 60;
@@ -759,7 +785,9 @@
         const rect = el.getBoundingClientRect();
         const padX = Math.max(6, rect.width * 0.08);
         const padY = Math.max(4, rect.height * 0.12);
-        const startTime = startElapsed + idx * WORD_STAGGER;
+        // data-delay в мс → переводим в секунды и добавляем baseDelay
+        const wordDelayMs = parseFloat(el.dataset.delay || 0) + (ANIM.iLoveYou?.baseDelay || 0);
+        const startTime = startElapsed + wordDelayMs / 1000;
 
         wordBursts.push({
           idx,
@@ -786,9 +814,10 @@
         }
       });
 
+      const maxWordDelayMs = Math.max(...Array.from(wordEls).map(el => parseFloat(el.dataset.delay || 0)));
       const deterministicWordsEnd =
         startElapsed +
-        (wordEls.length - 1) * WORD_STAGGER +
+        maxWordDelayMs / 1000 +
         DUST_START_JITTER_MAX +
         DUST_DUR * DUST_LIFE_MAX_FACTOR;
       lineStartAt = deterministicWordsEnd + LINE_AFTER_LAST_WORD_SEC;
@@ -1361,7 +1390,7 @@
           const baseStart = WAVE_START + p.spawnAt;
           const st = p.isContour
             ? baseStart
-            : NETWORK_START + (p.spawnAt - INTERIOR_START);
+            : NETWORK_START + p.spawnAt;
 
           if (animElapsed >= st && !p.born) {
             p.born = true;
@@ -1418,45 +1447,85 @@
       window.setTimeout(() => {
         if (started) return;
         introEl.classList.add('hidden');
-        preludeEl.classList.add('show');
+        preludeEl.classList.remove('show', 'done');
         prelude2El.classList.remove('show', 'done');
-        preludeWords.forEach((w) => w.classList.remove('visible'));
-        prelude2Words.forEach((w) => w.classList.remove('visible'));
+        // Сбрасываем все слова
+        preludeEl.querySelectorAll('.word').forEach(w => w.classList.remove('visible'));
+        prelude2El.querySelectorAll('.word').forEach(w => w.classList.remove('visible'));
 
-        const PRELUDE_FADE = 600;
-        const PRELUDE_HOLD = 420;
-        const wordsStartDelay = PRELUDE_WORDS_START_AT_SEC * 1000 + ANIM.preludeFirst.wordDelay;
-        const words2StartDelay = PRELUDE2_WORDS_START_AT_SEC * 1000 + ANIM.preludeSecond.wordDelay;
-
-        // Читаем data-delay каждого слова (мс от начала прелюди)
         const getDelay = (el) => parseFloat(el.dataset.delay || 0);
-        const maxDelay1 = Math.max(...Array.from(preludeWords).map(getDelay));
-        const maxDelay2 = Math.max(...Array.from(prelude2Words).map(getDelay));
 
-        const prelude1End = wordsStartDelay + maxDelay1 + PRELUDE_FADE + PRELUDE_HOLD;
-        const prelude2End = words2StartDelay + maxDelay2 + PRELUDE_FADE + PRELUDE_HOLD;
-        const preludeTotal = Math.max(prelude1End, prelude2End);
+        // ── PRELUDE 1 ──────────────────────────────────────────
+        const cfg1 = ANIM.preludeFirst;
+        const p1part1Els = preludeEl.querySelectorAll('.p1-part1');
+        const p1part2Els = preludeEl.querySelectorAll('.p1-part2');
+        const p1Start = cfg1.delay * 1000 + (cfg1.wordDelay || 0);
+        const p1MaxDelay = Math.max(...Array.from(p1part1Els).map(getDelay));
 
-        preludeWords.forEach((w) => {
-          window.setTimeout(() => {
-            w.classList.add('visible');
-          }, wordsStartDelay + getDelay(w));
-        });
-        prelude2Words.forEach((w) => {
-          window.setTimeout(() => {
-            prelude2El.classList.add('show');
-            w.classList.add('visible');
-          }, words2StartDelay + getDelay(w));
+        // Показываем prelude контейнер
+        window.setTimeout(() => preludeEl.classList.add('show'), p1Start);
+
+        // Часть 1: показываем слова по data-delay
+        p1part1Els.forEach(w => {
+          window.setTimeout(() => w.classList.add('visible'), p1Start + getDelay(w));
         });
 
+        // Часть 1 исчезает быстро и плавно
+        const p1HideAt = p1Start + p1MaxDelay + cfg1.part1HideAfter;
+        window.setTimeout(() => {
+          p1part1Els.forEach(w => {
+            if (w.classList.contains('visible')) {
+              w.classList.add('fadeout');
+            }
+          });
+        }, p1HideAt);
+
+        // Часть 2 появляется
+        const p1Part2At = p1HideAt + cfg1.part2ShowAfter;
+        window.setTimeout(() => {
+          p1part2Els.forEach(w => w.classList.add('visible'));
+        }, p1Part2At);
+
+        // Часть 2 исчезает + весь prelude1 скрывается
+        const p1EndAt = p1Part2At + cfg1.part2HideAfter;
         window.setTimeout(() => {
           preludeEl.classList.add('done');
-        }, prelude1End);
+        }, p1EndAt);
+
+        // ── PRELUDE 2 ──────────────────────────────────────────
+        const cfg2 = ANIM.preludeSecond;
+        const p2part1Els = prelude2El.querySelectorAll('.p2-part1');
+        const p2part2Els = prelude2El.querySelectorAll('.p2-part2');
+        const p2Start = cfg2.delay * 1000 + (cfg2.wordDelay || 0);
+        const p2MaxDelay = Math.max(...Array.from(p2part1Els).map(getDelay));
+
+        window.setTimeout(() => prelude2El.classList.add('show'), p2Start);
+
+        p2part1Els.forEach(w => {
+          window.setTimeout(() => w.classList.add('visible'), p2Start + getDelay(w));
+        });
+
+        const p2HideAt = p2Start + p2MaxDelay + cfg2.part1HideAfter;
+        window.setTimeout(() => {
+          p2part1Els.forEach(w => {
+            if (w.classList.contains('visible')) {
+              w.classList.add('fadeout');
+            }
+          });
+        }, p2HideAt);
+
+        const p2Part2At = p2HideAt + cfg2.part2ShowAfter;
+        window.setTimeout(() => {
+          p2part2Els.forEach(w => w.classList.add('visible'));
+        }, p2Part2At);
+
+        const p2EndAt = p2Part2At + cfg2.part2HideAfter;
         window.setTimeout(() => {
           prelude2El.classList.add('done');
-        }, prelude2End);
+        }, p2EndAt);
 
-        const mainStartDelay = Math.max(preludeTotal + 280, MAIN_ANIMATION_START_AT_SEC * 1000);
+        // ── MAIN ANIMATION ─────────────────────────────────────
+        const mainStartDelay = MAIN_ANIMATION_START_AT_SEC * 1000;
         window.setTimeout(() => {
           started = true;
           preludeEl.classList.remove('show', 'done');

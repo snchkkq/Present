@@ -249,6 +249,7 @@
   </div>
 
   <!-- Measurement-only prelude elements (opacity:0, z-index:-1) -->
+  <!-- data-delay (мс) — задержка появления каждого слова от startAt прелюдии -->
   <div id="prelude" aria-hidden="true">
     <div id="prelude-part1">
       <span class="word p1-part1" data-delay="0">This</span>
@@ -263,12 +264,13 @@
   <div id="prelude2" aria-hidden="true">
     <div id="prelude2-part1">
       <span class="word p2-part1" data-delay="0">You</span>
-      <span class="word p2-part1" data-delay="250">are</span>
-      <span class="word p2-part1" data-delay="820">my</span>
-      <span class="word p2-part1" data-delay="1300">beautiful</span>
+      <span class="word p2-part1" data-delay="380">are</span>
+      <span class="word p2-part1" data-delay="760">the</span>
+      <span class="word p2-part1" data-delay="1140">best</span>
+      <span class="word p2-part1" data-delay="1520">thing</span>
     </div>
     <div id="prelude2-part2">
-      <span class="word accent p2-part2" data-delay="0">Shayla</span>
+      <span class="word accent p2-part2" data-delay="0">Ever</span>
     </div>
   </div>
 
@@ -295,7 +297,6 @@
       // ── 🎬 ПРЕЛЮДИЯ 1: "This is all for" + "You" ───────────────────
       prelude1: {
         startAt:        8.78,   // секунд от старта до появления первого слова
-        wordStagger:    520,   // мс между словами ("This" → "is" → "all" → "for")
         holdPart1:      400,   // мс удержания после последнего слова части 1
         overlapPart2:   200,   // мс — насколько раньше появляется "You" (перекрытие)
         holdPart2:      1200,  // мс удержания слова "You"
@@ -303,13 +304,12 @@
         fadeOut:        0.40,  // секунд — скорость исчезновения
       },
 
-      // ── 🎬 ПРЕЛЮДИЯ 2: "You are my beautiful" + "Shayla" ───────────
+      // ── 🎬 ПРЕЛЮДИЯ 2: "You are the best thing" + "Ever" ───────────
       prelude2: {
         startAt:        17.35, // секунд от старта
-        wordStagger:    380,   // мс между словами
         holdPart1:      400,   // мс удержания части 1
-        overlapPart2:   200,   // мс перекрытия с "Shayla"
-        holdPart2:      1200,  // мс удержания "Shayla"
+        overlapPart2:   200,   // мс перекрытия с "You"
+        holdPart2:      1200,  // мс удержания "You"
         fadeIn:         0.40,
         fadeOut:        0.40,
       },
@@ -420,7 +420,6 @@
       preludeFirst: {
         delay:         CONFIG.prelude1.startAt,
         speed:         1,
-        interval:      CONFIG.prelude1.wordStagger,
         wordDelay:     0,
         part1HideAfter: CONFIG.prelude1.holdPart1,
         part2ShowAfter: CONFIG.prelude1.overlapPart2,
@@ -429,7 +428,6 @@
       preludeSecond: {
         delay:         CONFIG.prelude2.startAt,
         speed:         1,
-        interval:      CONFIG.prelude2.wordStagger,
         wordDelay:     0,
         part1HideAfter: CONFIG.prelude2.holdPart1,
         part2ShowAfter: CONFIG.prelude2.overlapPart2,
@@ -1710,6 +1708,8 @@
         const lineY1  = p1Rects.reduce((s2, r) => s2 + r.top + r.height / 2, 0) / p1Rects.length;
 
         let curX = pW / 2 - p1Total / 2;
+        // fadeOutStart одинаковый для всей группы — все исчезают вместе
+        const p1FadeOutStart = p1Hide - cfg.part1HideAfter / 1000 * 0.0 + (maxP1DelayMs / 1000);
         part1Els.forEach((el, i) => {
           const dMs = parseFloat(el.dataset.delay || 0);
           neonWords.push({
@@ -1719,7 +1719,8 @@
             cx     : curX + p1W[i] / 2,
             cy     : lineY1,
             showAt : s + dMs / 1000,
-            hideAt : p1Hide
+            hideAt : p1Hide,
+            fadeOutStart: p1Hide - cfg.part1HideAfter / 1000  // общий момент начала fadeOut
           });
           curX += p1W[i] + GAP;
         });
@@ -1762,11 +1763,11 @@
 
       const pulse = 0.84 + Math.sin(elapsed * GLOW_PULSE + word.cx * 0.008) * 0.16;
       const gA    = alpha * pulse;
-      const isA   = word.isAccent; // true for "You" and "Shayla" only — pink neon
+      const isA   = word.isAccent; // true for "You" and "Ever" only — pink neon
                                    // false for all other words — white neon
 
       if (isA) {
-        // ── ACCENT: pink-magenta neon (You / Shayla) ──────────────
+        // ── ACCENT: pink-magenta neon (You / Ever) ──────────────
         // Layer 1 — wide outer haze
         pCtx.shadowColor = 'rgba(255,0,130,1)';
         pCtx.shadowBlur  = 55;
@@ -1831,7 +1832,9 @@
       for (const word of neonWords) {
         if (elapsed < word.showAt || elapsed > word.hideAt) continue;
         const fadeInT  = Math.min(1, (elapsed - word.showAt) / FADE_IN_DUR);
-        const fadeOutT = Math.min(1, Math.max(0, (elapsed - (word.hideAt - FADE_OUT_DUR)) / FADE_OUT_DUR));
+        // fadeOutStart: общий для всей группы — все исчезают одновременно
+        const foStart  = word.fadeOutStart !== undefined ? word.fadeOutStart : (word.hideAt - FADE_OUT_DUR);
+        const fadeOutT = Math.min(1, Math.max(0, (elapsed - foStart) / FADE_OUT_DUR));
         const eIn      = 1 - Math.pow(1 - fadeInT, 3);
         const eOut     = Math.pow(1 - fadeOutT, 2);
         drawNeonWord(word, eIn * eOut, elapsed);
@@ -1858,15 +1861,24 @@
     function startExperience() {
       if (started || startPending) return;
       startPending = true;
+
+      // Разблокируем аудио сразу в момент tap — iOS требует play() в user gesture
       bgMusic.currentTime = 0;
-      bgMusic.play().catch(() => { });
+      bgMusic.play().then(() => {
+        bgMusic.pause(); // сразу ставим на паузу — запустим после эмодзи
+      }).catch(() => { });
+
       introEl.classList.add('exiting');
 
       window.setTimeout(() => {
         if (started) return;
         introEl.classList.add('hidden');
 
-        // Start particle prelude (reads DOM measurements)
+        // Запускаем музыку после исчезновения эмодзи
+        bgMusic.currentTime = 0;
+        bgMusic.play().catch(() => { });
+
+        // Start particle prelude
         startPreludeAnimation();
 
         // ── MAIN ANIMATION ─────────────────────────────────────

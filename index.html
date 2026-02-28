@@ -4,10 +4,8 @@
 <head>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style"
-    href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&family=Great+Vibes&display=swap">
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&family=Great+Vibes&display=swap">
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&family=Great+Vibes&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;600;700&family=Great+Vibes&display=swap">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>I Love You</title>
   <style>
@@ -57,9 +55,9 @@
       cursor: pointer;
       text-align: center;
       text-shadow:
-        0 0 14px rgba(255, 30, 120, 0.90),
-        0 0 30px rgba(220, 20, 80, 0.70),
-        0 0 55px rgba(180, 10, 60, 0.45);
+        0 0 14px rgba(255,30,120, 0.90),
+        0 0 30px rgba(220,20,80, 0.70),
+        0 0 55px rgba(180,10,60, 0.45);
       animation: introPulse 1900ms ease-in-out infinite;
     }
 
@@ -159,38 +157,19 @@
       stroke-linejoin: round;
     }
 
-    .ily-fill {
-      display: none;
-    }
+    .ily-fill { display: none; }
 
     @keyframes ilyDraw {
-      from {
-        stroke-dashoffset: var(--dash-len);
-      }
-
-      to {
-        stroke-dashoffset: 0;
-      }
+      from { stroke-dashoffset: var(--dash-len); }
+      to   { stroke-dashoffset: 0; }
     }
-
     @keyframes ilyGlow {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
-
     @keyframes ilyWordIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
 
     #txt::after {
@@ -202,48 +181,22 @@
       bottom: -8px;
       width: min(380px, 72vw);
       height: 2px;
-      background: linear-gradient(90deg, rgba(220, 20, 80, 0), rgba(255, 60, 130, 1.00), rgba(220, 20, 80, 0));
-      filter: drop-shadow(0 0 8px rgba(255, 40, 120, 0.90));
+      background: linear-gradient(90deg, rgba(220,20,80,0), rgba(255,60,130,1.00), rgba(220,20,80,0));
+      filter: drop-shadow(0 0 8px rgba(255,40,120,0.90));
       opacity: 0;
     }
-
     #txt.line-on::after {
-      animation: lineIn 850ms cubic-bezier(.2, .9, .2, 1) forwards, linePulse 2600ms ease-in-out infinite 850ms;
+      animation: lineIn 850ms cubic-bezier(.2,.9,.2,1) forwards, linePulse 2600ms ease-in-out infinite 850ms;
     }
-
     @keyframes lineIn {
-      from {
-        opacity: 0;
-        transform: translateX(-50%) scaleX(0.25);
-        filter: drop-shadow(0 0 2px rgba(180, 40, 90, .30));
-      }
-
-      to {
-        opacity: .9;
-        transform: translateX(-50%) scaleX(1);
-        filter: drop-shadow(0 0 10px rgba(235, 90, 140, .85));
-      }
+      from { opacity:0; transform:translateX(-50%) scaleX(0.25); filter:drop-shadow(0 0 2px rgba(180,40,90,.30)); }
+      to   { opacity:.9; transform:translateX(-50%) scaleX(1);   filter:drop-shadow(0 0 10px rgba(235,90,140,.85)); }
     }
-
     @keyframes linePulse {
-
-      0%,
-      100% {
-        opacity: .88;
-        filter: drop-shadow(0 0 10px rgba(210, 60, 110, .82));
-      }
-
-      50% {
-        opacity: 1;
-        filter: drop-shadow(0 0 14px rgba(235, 90, 140, .92));
-      }
+      0%,100% { opacity:.88; filter:drop-shadow(0 0 10px rgba(210,60,110,.82)); }
+      50%     { opacity:1;   filter:drop-shadow(0 0 14px rgba(235,90,140,.92)); }
     }
-
-    @media (max-width: 520px) {
-      #txt {
-        letter-spacing: 0.15em;
-      }
-    }
+    @media (max-width: 520px) { #txt { letter-spacing: 0.15em; } }
 
     /* ── PRELUDE: canvas overlay ────────────────────────────────────── */
     #prelude-canvas {
@@ -254,8 +207,7 @@
     }
 
     /* Hidden text elements used only to measure word geometry */
-    #prelude,
-    #prelude2 {
+    #prelude, #prelude2 {
       position: fixed;
       inset: 0;
       z-index: -1;
@@ -265,21 +217,15 @@
       align-items: center;
       justify-content: center;
     }
-
-    #prelude-part1,
-    #prelude-part2,
-    #prelude2-part1,
-    #prelude2-part2 {
+    #prelude-part1, #prelude-part2,
+    #prelude2-part1, #prelude2-part2 {
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       white-space: nowrap;
       text-align: center;
     }
-
-    #prelude .word,
-    #prelude2 .word {
+    #prelude .word, #prelude2 .word {
       display: inline-block;
       margin: 0 0.18em;
       font-family: 'Georgia', serif;
@@ -287,11 +233,10 @@
       font-style: italic;
       white-space: nowrap;
     }
-
-    #prelude .word.accent,
-    #prelude2 .word.accent {
+    #prelude .word.accent, #prelude2 .word.accent {
       font-size: clamp(32px, 6.5vw, 72px);
     }
+
   </style>
 </head>
 
@@ -349,68 +294,68 @@
 
       // ── 🎬 ПРЕЛЮДИЯ 1: "This is all for" + "You" ───────────────────
       prelude1: {
-        startAt: 8.78,   // секунд от старта до появления первого слова
-        wordStagger: 520,   // мс между словами ("This" → "is" → "all" → "for")
-        holdPart1: 400,   // мс удержания после последнего слова части 1
-        overlapPart2: 200,   // мс — насколько раньше появляется "You" (перекрытие)
-        holdPart2: 1200,  // мс удержания слова "You"
-        fadeIn: 0.20,  // секунд — скорость появления каждого слова
-        fadeOut: 0.20,  // секунд — скорость исчезновения
+        startAt:        8.78,   // секунд от старта до появления первого слова
+        wordStagger:    520,   // мс между словами ("This" → "is" → "all" → "for")
+        holdPart1:      400,   // мс удержания после последнего слова части 1
+        overlapPart2:   200,   // мс — насколько раньше появляется "You" (перекрытие)
+        holdPart2:      1200,  // мс удержания слова "You"
+        fadeIn:         0.40,  // секунд — скорость появления каждого слова
+        fadeOut:        0.40,  // секунд — скорость исчезновения
       },
 
       // ── 🎬 ПРЕЛЮДИЯ 2: "You are my beautiful" + "Shayla" ───────────
       prelude2: {
-        startAt: 17.35, // секунд от старта
-        wordStagger: 380,   // мс между словами
-        holdPart1: 400,   // мс удержания части 1
-        overlapPart2: 200,   // мс перекрытия с "Shayla"
-        holdPart2: 1200,  // мс удержания "Shayla"
-        fadeIn: 0.20,
-        fadeOut: 0.30,
+        startAt:        17.35, // секунд от старта
+        wordStagger:    380,   // мс между словами
+        holdPart1:      400,   // мс удержания части 1
+        overlapPart2:   200,   // мс перекрытия с "Shayla"
+        holdPart2:      1200,  // мс удержания "Shayla"
+        fadeIn:         0.40,
+        fadeOut:        0.40,
       },
 
       // ── 💎 PARTICLE NETWORK ─────────────────────────────────────────
       network: {
-        startAt: 8.9,   // секунд — когда начинается BFS-волна
-        bfsSpeed: 0.25,   // скорость волны (1.0 = нормально, 2.0 = вдвое быстрее)
-        linkDist: 68,    // макс. расстояние между точками для создания связи (px)
-        particleCount: 700,   // кол-во точек внутри (мобайл: 340)
-        contourCount: 260,   // кол-во точек по контуру (мобайл: 180)
-        nearMin: 0.74,  // мин. радиус размещения точек (доля от края)
-        nearMax: 0.96,  // макс. радиус (0.96 = не касается контура)
+        startAt:        8.9,   // секунд — когда начинается BFS-волна
+        bfsSpeed:       0.25,   // скорость волны (1.0 = нормально, 2.0 = вдвое быстрее)
+        linkDist:       68,    // макс. расстояние между точками для создания связи (px)
+        particleCount:  700,   // кол-во точек внутри (мобайл: 340)
+        contourCount:   260,   // кол-во точек по контуру (мобайл: 180)
+        nearMin:        0.74,  // мин. радиус размещения точек (доля от края)
+        nearMax:        0.96,  // макс. радиус (0.96 = не касается контура)
       },
 
       // ── 💓 ПУЛЬСИРУЮЩЕЕ СЕРДЦЕ ──────────────────────────────────────
       pulse: {
-        startAt: 19.2,
-        interval: 1.35,  // секунд между ударами
-        beatDur: 0.18,  // секунд — длительность одного удара
-        waveSpeed: 320,   // px/сек — скорость волны от верхушки вниз
-        waveDur: 0.45,  // секунд — как долго светится вспышка на точке/линии
-        heartScale: 0.20,  // размер сердечка (доля от sc — масштаба формулы)
+        startAt:        19,
+        interval:       1.35,  // секунд между ударами
+        beatDur:        0.18,  // секунд — длительность одного удара
+        waveSpeed:      320,   // px/сек — скорость волны от верхушки вниз
+        waveDur:        0.45,  // секунд — как долго светится вспышка на точке/линии
+        heartScale:     0.20,  // размер сердечка (доля от sc — масштаба формулы)
       },
 
       // ── 💬 "I LOVE YOU" ─────────────────────────────────────────────
       iLoveYou: {
-        startAt: 14.1,  // секунд — когда начинает появляться "I"
-        delayLove: 1.60,  // секунд после startAt — задержка "Love"
-        delayYou: 3.5,  // секунд после startAt — задержка "You"
-        drawSpeed: 1,   // базовая скорость рисования буквы (секунды для "I")
-        glowDur: 0.9,   // секунд — нарастание неонового свечения
+        startAt:        14,  // секунд — когда начинает появляться "I"
+        delayLove:      1.60,  // секунд после startAt — задержка "Love"
+        delayYou:       3.5,  // секунд после startAt — задержка "You"
+        drawSpeed:      1,   // базовая скорость рисования буквы (секунды для "I")
+        glowDur:        0.9,   // секунд — нарастание неонового свечения
       },
 
       // ── ⏱ КОНТУР СЕРДЦА ─────────────────────────────────────────────
       contour: {
-        startAt: 0.45,  // секунд — задержка перед рисованием контура
-        speed: 0.27,  // скорость рисования контура
-        glow: 5,     // яркость свечения контура после завершения
+        startAt:        0.45,  // секунд — задержка перед рисованием контура
+        speed:          0.27,  // скорость рисования контура
+        glow:           5,     // яркость свечения контура после завершения
       },
 
       // ── 🌐 ОБЩЕЕ ────────────────────────────────────────────────────
       global: {
-        mainSpeed: 0.74,  // общая скорость анимации (timeScale)
-        mainStartAt: 22.15, // секунд — когда запускается основная анимация
-        musicVolume: 0.62,  // громкость музыки (0.0 – 1.0)
+        mainSpeed:      0.74,  // общая скорость анимации (timeScale)
+        mainStartAt:    22.15, // секунд — когда запускается основная анимация
+        musicVolume:    0.62,  // громкость музыки (0.0 – 1.0)
       },
 
     };
@@ -451,33 +396,33 @@
       contour: {
         delay: CONFIG.contour.startAt,
         speed: CONFIG.contour.speed,
-        glow: CONFIG.contour.glow,
+        glow:  CONFIG.contour.glow,
       },
       network: {
-        delay: CONFIG.network.startAt,
-        speed: 5,
+        delay:    CONFIG.network.startAt,
+        speed:    5,
         bfsSpeed: CONFIG.network.bfsSpeed,
       },
       words: {
         delay: CONFIG.iLoveYou.startAt,
         speed: 1,
       },
-      line: { delay: 0.5, speed: 0.05 },
+      line:  { delay: 0.5, speed: 0.05 },
       sweep: { delay: -7, speed: 40, sweepSpeed: 7 },
       preludeFirst: {
-        delay: CONFIG.prelude1.startAt,
-        speed: 1,
-        interval: CONFIG.prelude1.wordStagger,
-        wordDelay: 0,
+        delay:         CONFIG.prelude1.startAt,
+        speed:         1,
+        interval:      CONFIG.prelude1.wordStagger,
+        wordDelay:     0,
         part1HideAfter: CONFIG.prelude1.holdPart1,
         part2ShowAfter: CONFIG.prelude1.overlapPart2,
         part2HideAfter: CONFIG.prelude1.holdPart2,
       },
       preludeSecond: {
-        delay: CONFIG.prelude2.startAt,
-        speed: 1,
-        interval: CONFIG.prelude2.wordStagger,
-        wordDelay: 0,
+        delay:         CONFIG.prelude2.startAt,
+        speed:         1,
+        interval:      CONFIG.prelude2.wordStagger,
+        wordDelay:     0,
         part1HideAfter: CONFIG.prelude2.holdPart1,
         part2ShowAfter: CONFIG.prelude2.overlapPart2,
         part2HideAfter: CONFIG.prelude2.holdPart2,
@@ -524,9 +469,9 @@
     // ── PULSE HEART ──────────────────────────────────────────────────
     const PULSE_INTERVAL = CONFIG.pulse.interval;
     const PULSE_BEAT_DUR = CONFIG.pulse.beatDur;
-    let pulseBeats = [];   // { time: animElapsed when beat fired }
-    let lastBeatTime = -999;
-    let pulseActive = false;
+    let   pulseBeats     = [];   // { time: animElapsed when beat fired }
+    let   lastBeatTime   = -999;
+    let   pulseActive    = false;
 
     function pickDepthLayer() {
       const r = Math.random();
@@ -602,19 +547,19 @@
 
       const pairCount = Math.floor(INTERIOR_COUNT / 2);
       for (let i = 0; i < pairCount; i++) {
-        const t = srng() * Math.PI * 2;
-        const r = NEAR_MIN + srng() * (NEAR_MAX - NEAR_MIN);
-        const sx = hx(t) * sc * r;
-        const txR = cx + Math.abs(sx);
-        const txL = cx - Math.abs(sx);
-        const ty = cy + hy(t) * sc * r;
+        const t       = srng() * Math.PI * 2;
+        const r       = NEAR_MIN + srng() * (NEAR_MAX - NEAR_MIN);
+        const sx      = hx(t) * sc * r;
+        const txR     = cx + Math.abs(sx);
+        const txL     = cx - Math.abs(sx);
+        const ty      = cy + hy(t) * sc * r;
         const spawnAt = srng() * WAVE_DUR;
-        const size = 1.05 + srng() * 1.35;
-        const phase = srng() * Math.PI * 2;
-        const pulse = 0.5 + srng() * 0.9;
+        const size    = 1.05 + srng() * 1.35;
+        const phase   = srng() * Math.PI * 2;
+        const pulse   = 0.5 + srng() * 0.9;
         // Depth: points near contour are mostly front-layer
-        const dRoll = srng();
-        const depth = dRoll < 0.18 ? 0 : dRoll < 0.52 ? 1 : 2;
+        const dRoll   = srng();
+        const depth   = dRoll < 0.18 ? 0 : dRoll < 0.52 ? 1 : 2;
 
         particles.push({
           x: txR, y: ty, tx: txR, ty,
@@ -630,10 +575,10 @@
       }
 
       if (INTERIOR_COUNT % 2 === 1) {
-        const t = srng() * Math.PI * 2;
-        const r = NEAR_MIN + srng() * (NEAR_MAX - NEAR_MIN);
-        const tx = cx;
-        const ty = cy + hy(t) * sc * r;
+        const t       = srng() * Math.PI * 2;
+        const r       = NEAR_MIN + srng() * (NEAR_MAX - NEAR_MIN);
+        const tx      = cx;
+        const ty      = cy + hy(t) * sc * r;
         const spawnAt = srng() * WAVE_DUR;
         particles.push({
           x: tx, y: ty, tx, ty,
@@ -834,18 +779,18 @@
     // Uses SVG <text> with stroke-dashoffset animation to simulate
     // a pen drawing each word. After drawing, a neon glow fades in.
 
-    const ilySvg = document.getElementById('iloveyou-svg');
+    const ilySvg   = document.getElementById('iloveyou-svg');
     // ── I LOVE YOU — Canvas рендер (надёжно на iOS Safari) ──────────
     // SVG stroke-dashoffset ненадёжен в Safari — используем Canvas + lineDash
 
     const ILY_WORDS = [
-      { text: 'I', delaySec: 0.0 },
+      { text: 'I',    delaySec: 0.0  },
       { text: 'Love', delaySec: CONFIG.iLoveYou.delayLove },
-      { text: 'You', delaySec: CONFIG.iLoveYou.delayYou }
+      { text: 'You',  delaySec: CONFIG.iLoveYou.delayYou  }
     ];
 
     const ILY_DRAW_BASE = CONFIG.iLoveYou.drawSpeed;
-    const ILY_GLOW_DUR = CONFIG.iLoveYou.glowDur;
+    const ILY_GLOW_DUR  = CONFIG.iLoveYou.glowDur;
 
     // Состояние каждого слова
     const ilyWords = ILY_WORDS.map(w => ({
@@ -854,10 +799,10 @@
       startTime: null,
     }));
 
-    let ilyBuilt = false;
+    let ilyBuilt    = false;
     let ilyFontSize = 0;
-    let ilyY = 0;   // Y позиция текста на canvas (от верха экрана)
-    let ilyLayout = [];  // [{text, x, pathLen, drawDur}]
+    let ilyY        = 0;   // Y позиция текста на canvas (от верха экрана)
+    let ilyLayout   = [];  // [{text, x, pathLen, drawDur}]
 
     function buildIlySvg() {
       // скрываем SVG — рендерим на canvas
@@ -896,8 +841,12 @@
 
       let curX = (screenW - totalW) / 2;
       ilyLayout = ws.map(w => {
-        const pathLen = w.width * 3.2 + w.text.length * 22;
-        const drawDur = ILY_DRAW_BASE * (0.7 + w.text.length * 0.22);
+        // Great Vibes — рукописный шрифт с завитками, реальный путь глифа
+        // намного длиннее чем measureText. Используем щедрый множитель.
+        // Для "I" особенно — у него завиток сверху и снизу.
+        const charMultiplier = w.text === 'I' ? 10.0 : w.text === 'You' ? 9.0 : 6.0;
+        const pathLen = Math.max(w.width * charMultiplier, ilyFontSize * w.text.length * 4.0);
+        const drawDur = ILY_DRAW_BASE * (0.5 + w.text.length * 0.28);
         const x = curX + w.width / 2;
         curX += w.width + GAP;
         return { text: w.text, x, pathLen, drawDur };
@@ -909,8 +858,8 @@
       buildIlyLayout();
 
       ctx.save();
-      ctx.font = `400 ${ilyFontSize}px 'Great Vibes', cursive`;
-      ctx.textAlign = 'center';
+      ctx.font         = `400 ${ilyFontSize}px 'Great Vibes', cursive`;
+      ctx.textAlign    = 'center';
       ctx.textBaseline = 'alphabetic';
 
       ILY_WORDS.forEach((word, wi) => {
@@ -920,30 +869,40 @@
         const st = ilyWords[wi];
         if (!st.startTime) st.startTime = elapsed;
 
-        const t = elapsed - st.startTime;
+        const t      = elapsed - st.startTime;
         const layout = ilyLayout[wi];
         if (!layout) return;
 
         const { x, pathLen, drawDur } = layout;
-        const drawT = Math.min(1, t / drawDur);
-        const glowT = t > drawDur ? Math.min(1, (t - drawDur) / ILY_GLOW_DUR) : 0;
+
+        // drawT: [0→1] прогресс рисования штриха
+        const drawT  = Math.min(1, t / drawDur);
+        // glowT: начинает нарастать с 80% рисования — плавно перетекает
+        const glowStart = 0.8;
+        const glowT  = Math.min(1, Math.max(0, (drawT - glowStart) / (1 - glowStart)));
+        // fadeIn: плавное появление в самом начале
+        const fadeIn = Math.min(1, t / 0.25);
         const offset = pathLen * (1 - drawT);
 
-        // Слой 1 — розовый ореол (тонкий, только вдоль контура)
-        ctx.globalAlpha = 0.55 + glowT * 0.25;
-        ctx.shadowColor = 'rgba(255,80,160,1)';
-        ctx.shadowBlur = 8 + glowT * 6;
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = 'rgba(255,100,170,0.25)';
+        // Слой 0 — лёгкий широкий ореол
+        ctx.globalAlpha = fadeIn * glowT * 0.12;
+        ctx.lineWidth   = 8;
+        ctx.strokeStyle = 'rgba(255,80,150,1)';
+        ctx.setLineDash([pathLen, pathLen]);
+        ctx.lineDashOffset = offset;
+        ctx.strokeText(layout.text, x, ilyY);
+
+        // Слой 1 — средний розовый
+        ctx.globalAlpha = fadeIn * glowT * 0.22;
+        ctx.lineWidth   = 3.5;
+        ctx.strokeStyle = 'rgba(255,120,180,1)';
         ctx.setLineDash([pathLen, pathLen]);
         ctx.lineDashOffset = offset;
         ctx.strokeText(layout.text, x, ilyY);
 
         // Слой 2 — белое ядро
-        ctx.globalAlpha = 0.9 + glowT * 0.1;
-        ctx.shadowBlur = 3 + glowT * 5;
-        ctx.shadowColor = 'rgba(255,180,220,1)';
-        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = fadeIn * (0.75 + glowT * 0.25);
+        ctx.lineWidth   = 1.2;
         ctx.strokeStyle = 'rgba(255,245,252,0.95)';
         ctx.setLineDash([pathLen, pathLen]);
         ctx.lineDashOffset = offset;
@@ -952,7 +911,7 @@
 
       ctx.setLineDash([]);
       ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
+      ctx.shadowBlur  = 0;
       ctx.restore();
     }
 
@@ -965,9 +924,9 @@
         build();
       }
 
-      const lastWord = ILY_WORDS[ILY_WORDS.length - 1];
+      const lastWord    = ILY_WORDS[ILY_WORDS.length - 1];
       const lastDrawDur = ILY_DRAW_BASE * (0.7 + lastWord.text.length * 0.18);
-      lineStartAt = elapsed + lastWord.delaySec + lastDrawDur + ILY_GLOW_DUR + 0.3;
+      lineStartAt        = elapsed + lastWord.delaySec + lastDrawDur + ILY_GLOW_DUR + 0.3;
       contourNeonStartAt = lineStartAt + LINE_IN_DUR_SEC + NEON_AFTER_LINE_SEC;
     }
 
@@ -1297,8 +1256,8 @@
       // Each pass strokes ALL visible links in one path per layer — 9 draw calls total.
       for (let layer = 0; layer <= 2; layer++) {
         const outerColor = layer === 0 ? '180,20,60' : layer === 1 ? '220,30,80' : '255,40,110';
-        const mainColor = layer === 0 ? '200,30,70' : layer === 1 ? '235,50,100' : '255,60,130';
-        const coreColor = layer === 0 ? '220,50,85' : layer === 1 ? '245,80,125' : '255,130,165';
+        const mainColor  = layer === 0 ? '200,30,70' : layer === 1 ? '235,50,100' : '255,60,130';
+        const coreColor  = layer === 0 ? '220,50,85' : layer === 1 ? '245,80,125' : '255,130,165';
         const depthAlpha = DEPTH_LINK_ALPHA[layer];
         const depthWidth = DEPTH_LINK_WIDTH[layer];
         const frontBoost = layer === 2 ? 1.16 : 1;
@@ -1495,13 +1454,13 @@
         ctx.lineJoin = 'round';
         // On mobile: skip the two heavy outer glow passes (blur 22 & 11) to save GPU
         const passes = IS_MOBILE ? [
-          { blur: 5, color: `rgba(255,50,120,${0.70 * breathe})`, w: 2.2 },
-          { blur: 1, color: `rgba(255,80,140,${0.85 * breathe})`, w: 0.9 },
+          { blur: 5,  color: `rgba(255,50,120,${0.70 * breathe})`, w: 2.2 },
+          { blur: 1,  color: `rgba(255,80,140,${0.85 * breathe})`, w: 0.9 },
         ] : [
-          { blur: 22, color: `rgba(255,40,110,${0.28 * breathe})`, w: 11 },
-          { blur: 11, color: `rgba(255,200,230,${0.45 * breathe})`, w: 5 },
-          { blur: 5, color: `rgba(255,50,120,${0.70 * breathe})`, w: 2.2 },
-          { blur: 2, color: `rgba(255,80,140,${0.85 * breathe})`, w: 0.9 },
+          { blur: 22, color: `rgba(255,40,110,${0.28 * breathe})`,  w: 11  },
+          { blur: 11, color: `rgba(255,200,230,${0.45 * breathe})`, w: 5   },
+          { blur: 5,  color: `rgba(255,50,120,${0.70 * breathe})`, w: 2.2 },
+          { blur: 2,  color: `rgba(255,80,140,${0.85 * breathe})`, w: 0.9 },
         ];
         for (const p of passes) {
           ctx.beginPath();
@@ -1550,7 +1509,7 @@
 
       // Запускаем анимацию при первом вызове
       if (alinaState === 'idle') {
-        alinaState = 'drawing';
+        alinaState    = 'drawing';
         alinaStartTime = animElapsed;
       }
 
@@ -1558,55 +1517,64 @@
 
       // Параметры шрифта
       const fontSize = Math.round(Math.max(28, Math.min(64, sc * 2.8)));
-      const font = `400 ${fontSize}px 'Great Vibes', cursive`;
+      const font     = `400 ${fontSize}px 'Great Vibes', cursive`;
 
       // Длина пути (приблизительно для "Alina")
-      const pathLen = fontSize * 14;
-      const drawDur = 2.2; // секунд на рисование
-      const glowDur = 0.8; // секунд нарастания свечения после
+      const pathLen  = fontSize * 14;
+      const drawDur  = 2.2; // секунд на рисование
+      const glowDur  = 0.8; // секунд нарастания свечения после
 
       // Прогресс рисования [0..1]
-      const drawT = Math.min(1, elapsed / drawDur);
+      const drawT  = Math.min(1, elapsed / drawDur);
       const offset = pathLen * (1 - drawT);
 
       // После рисования — нарастание свечения
-      const glowT = elapsed > drawDur ? Math.min(1, (elapsed - drawDur) / glowDur) : 0;
+      const glowT  = elapsed > drawDur ? Math.min(1, (elapsed - drawDur) / glowDur) : 0;
 
       ctx.save();
       ctx.translate(cx, cy);
-      ctx.font = font;
-      ctx.textAlign = 'center';
+      ctx.font         = font;
+      ctx.textAlign    = 'center';
       ctx.textBaseline = 'middle';
 
-      // Слой 1 — мягкий розовый ореол
-      ctx.globalAlpha = 0.18 + glowT * 0.12;
-      ctx.shadowColor = 'rgba(255,60,150,1)';
-      ctx.shadowBlur = 10 + glowT * 8;
-      ctx.lineWidth = 7;
-      ctx.strokeStyle = 'rgba(255,80,160,0.5)';
+      const fadeIn = Math.min(1, elapsed / 0.25);
+      // glowT начинает нарастать с 80% рисования
+      const glowStart = 0.8;
+      const glowT2 = Math.min(1, Math.max(0, (drawT - glowStart) / (1 - glowStart)));
+
+      // Слой 0 — лёгкий широкий ореол
+      ctx.globalAlpha  = fadeIn * glowT2 * 0.10;
+      ctx.lineWidth    = 9;
+      ctx.strokeStyle  = 'rgba(255,80,150,1)';
+      ctx.setLineDash([pathLen, pathLen]);
+      ctx.lineDashOffset = offset;
+      ctx.strokeText('Alina', 0, 0);
+
+      // Слой 1 — средний розовый
+      ctx.globalAlpha  = fadeIn * glowT2 * 0.22;
+      ctx.lineWidth    = 4;
+      ctx.strokeStyle  = 'rgba(255,120,180,1)';
       ctx.setLineDash([pathLen, pathLen]);
       ctx.lineDashOffset = offset;
       ctx.strokeText('Alina', 0, 0);
 
       // Слой 2 — белое ядро
-      ctx.globalAlpha = 0.85 + glowT * 0.15;
-      ctx.shadowColor = 'rgba(255,120,180,1)';
-      ctx.shadowBlur = 4 + glowT * 6;
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = 'rgba(255,240,250,0.95)';
+      ctx.globalAlpha  = fadeIn * (0.8 + glowT2 * 0.2);
+      ctx.lineWidth    = 1.2;
+      ctx.strokeStyle  = 'rgba(255,240,250,0.95)';
       ctx.setLineDash([pathLen, pathLen]);
       ctx.lineDashOffset = offset;
       ctx.strokeText('Alina', 0, 0);
 
       ctx.setLineDash([]);
       ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
+      ctx.shadowBlur  = 0;
       ctx.restore();
     }
 
     // updatePulse и drawPulseFlash оставляем пустыми
-    function updatePulse(animElapsed) { }
-    function drawPulseFlash(animElapsed) { }
+    function updatePulse(animElapsed) {}
+    function drawPulseFlash(animElapsed) {}
 
     function frame() {
       if (!started) return;
@@ -1694,14 +1662,14 @@
     const NEON_FONT_NORMAL = () => `700 ${Math.round(Math.max(28, Math.min(58, window.innerWidth * 0.054)))}px 'Raleway', sans-serif`;
     const NEON_FONT_ACCENT = () => `700 ${Math.round(Math.max(38, Math.min(80, window.innerWidth * 0.07)))}px 'Raleway', sans-serif`;
 
-    const FADE_IN_DUR = CONFIG.prelude1.fadeIn;
+    const FADE_IN_DUR  = CONFIG.prelude1.fadeIn;
     const FADE_OUT_DUR = CONFIG.prelude1.fadeOut;
-    const GLOW_PULSE = 4.6;
+    const GLOW_PULSE   = 4.6;
 
     let neonWords = [];
     let preludeStartTime = null;
-    let preludeActive = false;
-    let preludeRAF = null;
+    let preludeActive    = false;
+    let preludeRAF       = null;
 
     function buildNeonWords() {
       neonWords = [];
@@ -1713,10 +1681,10 @@
         if (!part1Els.length) return;
 
         const maxP1DelayMs = Math.max(...part1Els.map(e => parseFloat(e.dataset.delay || 0)));
-        const s = cfg.delay;
-        const p1Hide = s + maxP1DelayMs / 1000 + cfg.part1HideAfter / 1000;
-        const p2Show = p1Hide + cfg.part2ShowAfter / 1000;
-        const p2Hide = p2Show + cfg.part2HideAfter / 1000;
+        const s       = cfg.delay;
+        const p1Hide  = s + maxP1DelayMs / 1000 + cfg.part1HideAfter / 1000;
+        const p2Show  = p1Hide + cfg.part2ShowAfter / 1000;
+        const p2Hide  = p2Show + cfg.part2HideAfter / 1000;
 
         // Measure part1 words and compute X positions
         const off = document.createElement('canvas').getContext('2d');
@@ -1725,25 +1693,25 @@
         off.font = fontN;
         const GAP = off.measureText(' ').width * 0.9;
 
-        const p1Texts = part1Els.map(e => e.textContent.trim());
-        const p1W = p1Texts.map(t => { off.font = fontN; return off.measureText(t).width; });
-        const p1Total = p1W.reduce((a, b) => a + b, 0) + GAP * (p1Texts.length - 1);
+        const p1Texts  = part1Els.map(e => e.textContent.trim());
+        const p1W      = p1Texts.map(t => { off.font = fontN; return off.measureText(t).width; });
+        const p1Total  = p1W.reduce((a, b) => a + b, 0) + GAP * (p1Texts.length - 1);
 
         // Y from DOM rect (element is invisible but laid out)
         const p1Rects = part1Els.map(e => e.getBoundingClientRect());
-        const lineY1 = p1Rects.reduce((s2, r) => s2 + r.top + r.height / 2, 0) / p1Rects.length;
+        const lineY1  = p1Rects.reduce((s2, r) => s2 + r.top + r.height / 2, 0) / p1Rects.length;
 
         let curX = pW / 2 - p1Total / 2;
         part1Els.forEach((el, i) => {
           const dMs = parseFloat(el.dataset.delay || 0);
           neonWords.push({
-            text: p1Texts[i],
-            font: fontN,
+            text   : p1Texts[i],
+            font   : fontN,
             isAccent: false,
-            cx: curX + p1W[i] / 2,
-            cy: lineY1,
-            showAt: s + dMs / 1000,
-            hideAt: p1Hide
+            cx     : curX + p1W[i] / 2,
+            cy     : lineY1,
+            showAt : s + dMs / 1000,
+            hideAt : p1Hide
           });
           curX += p1W[i] + GAP;
         });
@@ -1751,27 +1719,27 @@
         // Part2 words (accent)
         if (part2Els.length) {
           const p2Texts = part2Els.map(e => e.textContent.trim());
-          const p2W = p2Texts.map(t => { off.font = fontA; return off.measureText(t).width; });
+          const p2W     = p2Texts.map(t => { off.font = fontA; return off.measureText(t).width; });
           const p2Total = p2W.reduce((a, b) => a + b, 0) + GAP * (p2Texts.length - 1);
           const p2Rects = part2Els.map(e => e.getBoundingClientRect());
-          const lineY2 = p2Rects.reduce((s2, r) => s2 + r.top + r.height / 2, 0) / p2Rects.length;
+          const lineY2  = p2Rects.reduce((s2, r) => s2 + r.top + r.height / 2, 0) / p2Rects.length;
           let p2X = pW / 2 - p2Total / 2;
           part2Els.forEach((el, i) => {
             neonWords.push({
-              text: p2Texts[i],
-              font: fontA,
+              text   : p2Texts[i],
+              font   : fontA,
               isAccent: true,
-              cx: p2X + p2W[i] / 2,
-              cy: lineY2,
-              showAt: p2Show,
-              hideAt: p2Hide
+              cx     : p2X + p2W[i] / 2,
+              cy     : lineY2,
+              showAt : p2Show,
+              hideAt : p2Hide
             });
             p2X += p2W[i] + GAP;
           });
         }
       }
 
-      collectLine(preludeEl, '.p1-part1', '.p1-part2', ANIM.preludeFirst);
+      collectLine(preludeEl,  '.p1-part1', '.p1-part2', ANIM.preludeFirst);
       collectLine(prelude2El, '.p2-part1', '.p2-part2', ANIM.preludeSecond);
     }
 
@@ -1780,39 +1748,39 @@
       pCtx.save();
       pCtx.imageSmoothingEnabled = true;
       pCtx.imageSmoothingQuality = 'high';
-      pCtx.font = word.font;
-      pCtx.textAlign = 'center';
+      pCtx.font         = word.font;
+      pCtx.textAlign    = 'center';
       pCtx.textBaseline = 'middle';
 
       const pulse = 0.84 + Math.sin(elapsed * GLOW_PULSE + word.cx * 0.008) * 0.16;
-      const gA = alpha * pulse;
-      const isA = word.isAccent; // true for "You" and "Shayla" only — pink neon
-      // false for all other words — white neon
+      const gA    = alpha * pulse;
+      const isA   = word.isAccent; // true for "You" and "Shayla" only — pink neon
+                                   // false for all other words — white neon
 
       if (isA) {
         // ── ACCENT: pink-magenta neon (You / Shayla) ──────────────
         // Layer 1 — wide outer haze
         pCtx.shadowColor = 'rgba(255,0,130,1)';
-        pCtx.shadowBlur = 55;
-        pCtx.lineWidth = 3.5;
+        pCtx.shadowBlur  = 55;
+        pCtx.lineWidth   = 3.5;
         pCtx.strokeStyle = `rgba(255,10,110,${gA * 0.38})`;
         pCtx.strokeText(word.text, word.cx, word.cy);
 
         // Layer 2 — mid glow
-        pCtx.shadowBlur = 24;
-        pCtx.lineWidth = 2.5;
+        pCtx.shadowBlur  = 24;
+        pCtx.lineWidth   = 2.5;
         pCtx.strokeStyle = `rgba(255,60,170,${gA * 0.72})`;
         pCtx.strokeText(word.text, word.cx, word.cy);
 
         // Layer 3 — sharp neon edge
-        pCtx.shadowBlur = 9;
-        pCtx.lineWidth = 1.5;
+        pCtx.shadowBlur  = 9;
+        pCtx.lineWidth   = 1.5;
         pCtx.strokeStyle = `rgba(255,100,200,${gA})`;
         pCtx.strokeText(word.text, word.cx, word.cy);
 
         // Layer 4 — bright core hairline
-        pCtx.shadowBlur = 2;
-        pCtx.lineWidth = 0.5;
+        pCtx.shadowBlur  = 2;
+        pCtx.lineWidth   = 0.5;
         pCtx.strokeStyle = `rgba(255,230,248,${alpha * 0.92})`;
         pCtx.strokeText(word.text, word.cx, word.cy);
 
@@ -1820,26 +1788,26 @@
         // ── NORMAL: pure white neon (all other words) ─────────────
         // Layer 1 — wide outer haze
         pCtx.shadowColor = 'rgba(255,255,255,1)';
-        pCtx.shadowBlur = 40;
-        pCtx.lineWidth = 2.6;
+        pCtx.shadowBlur  = 40;
+        pCtx.lineWidth   = 2.6;
         pCtx.strokeStyle = `rgba(220,220,220,${gA * 0.25})`;
         pCtx.strokeText(word.text, word.cx, word.cy);
 
         // Layer 2 — mid glow
-        pCtx.shadowBlur = 18;
-        pCtx.lineWidth = 1.9;
+        pCtx.shadowBlur  = 18;
+        pCtx.lineWidth   = 1.9;
         pCtx.strokeStyle = `rgba(240,240,240,${gA * 0.55})`;
         pCtx.strokeText(word.text, word.cx, word.cy);
 
         // Layer 3 — sharp white edge
-        pCtx.shadowBlur = 7;
-        pCtx.lineWidth = 1.1;
+        pCtx.shadowBlur  = 7;
+        pCtx.lineWidth   = 1.1;
         pCtx.strokeStyle = `rgba(255,255,255,${gA})`;
         pCtx.strokeText(word.text, word.cx, word.cy);
 
         // Layer 4 — bright core hairline
-        pCtx.shadowBlur = 2;
-        pCtx.lineWidth = 0.5;
+        pCtx.shadowBlur  = 2;
+        pCtx.lineWidth   = 0.5;
         pCtx.strokeStyle = `rgba(255,255,255,${alpha * 0.95})`;
         pCtx.strokeText(word.text, word.cx, word.cy);
       }
@@ -1854,10 +1822,10 @@
 
       for (const word of neonWords) {
         if (elapsed < word.showAt || elapsed > word.hideAt) continue;
-        const fadeInT = Math.min(1, (elapsed - word.showAt) / FADE_IN_DUR);
+        const fadeInT  = Math.min(1, (elapsed - word.showAt) / FADE_IN_DUR);
         const fadeOutT = Math.min(1, Math.max(0, (elapsed - (word.hideAt - FADE_OUT_DUR)) / FADE_OUT_DUR));
-        const eIn = 1 - Math.pow(1 - fadeInT, 3);
-        const eOut = Math.pow(1 - fadeOutT, 2);
+        const eIn      = 1 - Math.pow(1 - fadeInT, 3);
+        const eOut     = Math.pow(1 - fadeOutT, 2);
         drawNeonWord(word, eIn * eOut, elapsed);
       }
 
@@ -1868,8 +1836,8 @@
       requestAnimationFrame(() => {
         buildNeonWords();
         preludeStartTime = performance.now();
-        preludeActive = true;
-        preludeRAF = requestAnimationFrame(drawPreludeFrame);
+        preludeActive    = true;
+        preludeRAF       = requestAnimationFrame(drawPreludeFrame);
       });
     }
 
@@ -1908,4 +1876,3 @@
     startBtn.addEventListener('click', startExperience);
 
   </script>
-</body>

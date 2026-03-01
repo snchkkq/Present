@@ -1512,28 +1512,28 @@
       const glowStrength = Math.max(0.1, Math.min(1, ANIM.contour.glow));
       const breathe = (0.82 + Math.sin(elapsed * 2.4) * 0.18) * glowStrength;
 
-      // Финальная подсветка — плавно нарастает после finalGlowAt
-      const fgAt = CONFIG.contour.finalGlowAt;
-      const fgSpeed = CONFIG.contour.finalGlowSpeed;
-      const fgPower = CONFIG.contour.finalGlowPower;
-      const finalT = elapsed > fgAt ? Math.min(1, (elapsed - fgAt) / fgSpeed) : 0;
-      const finalMult = 1 + finalT * (fgPower - 1); // от 1 до fgPower
+      // Финальное неоновое свечение — плавно нарастает после finalGlowAt
+      const finalT = elapsed > CONFIG.contour.finalGlowAt
+        ? Math.min(1, (elapsed - CONFIG.contour.finalGlowAt) / CONFIG.contour.finalGlowSpeed)
+        : 0;
 
       function drawNeonLine(pts, closed) {
         if (pts.length < 2) return;
         ctx.save();
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        // On mobile: skip the two heavy outer glow passes (blur 22 & 11) to save GPU
+
+        // Основные passes — не трогаем, как были
         const passes = IS_MOBILE ? [
-          { blur: 5, color: `rgba(255,50,120,${0.70 * breathe * finalMult})`, w: 2.2 * Math.max(1, finalMult * 0.6) },
-          { blur: 1, color: `rgba(255,80,140,${0.85 * breathe * finalMult})`, w: 0.9 },
+          { blur: 5, color: `rgba(255,50,120,${0.70 * breathe})`, w: 2.2 },
+          { blur: 1, color: `rgba(255,80,140,${0.85 * breathe})`, w: 0.9 },
         ] : [
-          { blur: 22 * finalMult, color: `rgba(255,40,110,${0.28 * breathe * finalMult})`, w: 11 },
-          { blur: 11 * finalMult, color: `rgba(255,200,230,${0.45 * breathe * finalMult})`, w: 5 },
-          { blur: 5, color: `rgba(255,50,120,${0.70 * breathe * finalMult})`, w: 2.2 },
-          { blur: 2, color: `rgba(255,80,140,${0.85 * breathe * finalMult})`, w: 0.9 },
+          { blur: 22, color: `rgba(255,40,110,${0.28 * breathe})`,  w: 11  },
+          { blur: 11, color: `rgba(255,200,230,${0.45 * breathe})`, w: 5   },
+          { blur: 5,  color: `rgba(255,50,120,${0.70 * breathe})`,  w: 2.2 },
+          { blur: 2,  color: `rgba(255,80,140,${0.85 * breathe})`,  w: 0.9 },
         ];
+
         for (const p of passes) {
           ctx.beginPath();
           ctx.moveTo(pts[0].x, pts[0].y);
@@ -1545,6 +1545,33 @@
           ctx.lineWidth = p.w;
           ctx.stroke();
         }
+
+        // Финальный неон — дополнительные слои поверх, нарастают плавно
+        if (finalT > 0) {
+          const pw = CONFIG.contour.finalGlowPower;
+          const neonPasses = IS_MOBILE ? [
+            { blur: 18, color: `rgba(255,20,100,${0.35 * finalT * pw})`,  w: 8   },
+            { blur: 8,  color: `rgba(255,100,180,${0.55 * finalT * pw})`, w: 3   },
+            { blur: 2,  color: `rgba(255,220,240,${0.7 * finalT})`,        w: 0.8 },
+          ] : [
+            { blur: 40, color: `rgba(255,0,80,${0.22 * finalT * pw})`,    w: 18  },
+            { blur: 20, color: `rgba(255,40,120,${0.40 * finalT * pw})`,  w: 8   },
+            { blur: 8,  color: `rgba(255,120,190,${0.60 * finalT * pw})`, w: 3   },
+            { blur: 2,  color: `rgba(255,230,245,${0.80 * finalT})`,      w: 0.7 },
+          ];
+          for (const p of neonPasses) {
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+            if (closed) ctx.closePath();
+            ctx.shadowColor = 'rgba(255,0,100,1)';
+            ctx.shadowBlur = p.blur;
+            ctx.strokeStyle = p.color;
+            ctx.lineWidth = p.w;
+            ctx.stroke();
+          }
+        }
+
         ctx.restore();
       }
 

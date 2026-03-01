@@ -337,7 +337,7 @@
   <div id="txt" aria-label="I Love You">
     <span class="word highlight" data-delay="0">I</span>
     <span class="word highlight" data-delay="1450">Love</span>
-    <span class="word highlight" data-delay="2800">You</span>
+    <span class="word highlight" data-delay="2780">You</span>
   </div>
   <!-- Handwriting SVG for I Love You — populated by JS -->
   <svg id="iloveyou-svg" aria-hidden="true"></svg>
@@ -403,7 +403,7 @@
 
       // ── 💫 "ALINA" ──────────────────────────────────────────────────
       alina: {
-        startAt: 19.4,    // секунд — когда начинает рисоваться имя
+        startAt: 19.2,    // секунд — когда начинает рисоваться имя
         drawSpeed: 2.2,   // секунд на рисование (меньше = быстрее)
         glowSpeed: 0.98,   // скорость появления свечения (меньше = быстрее, 0.8 = с 80% рисования)
       },
@@ -1525,8 +1525,9 @@
 
         // Основные passes — не трогаем, как были
         const passes = IS_MOBILE ? [
-          { blur: 5, color: `rgba(255,50,120,${0.70 * breathe})`, w: 2.2 },
-          { blur: 1, color: `rgba(255,80,140,${0.85 * breathe})`, w: 0.9 },
+          { blur: 14, color: `rgba(255,30,110,${0.22 * breathe})`, w: 7   },
+          { blur: 5,  color: `rgba(255,50,120,${0.70 * breathe})`, w: 2.2 },
+          { blur: 1,  color: `rgba(255,80,140,${0.85 * breathe})`, w: 0.9 },
         ] : [
           { blur: 22, color: `rgba(255,40,110,${0.28 * breathe})`,  w: 11  },
           { blur: 11, color: `rgba(255,200,230,${0.45 * breathe})`, w: 5   },
